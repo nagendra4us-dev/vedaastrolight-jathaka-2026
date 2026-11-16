@@ -2329,13 +2329,52 @@
       return devId;
     }
 
-    function checkLicenseStatus() {
+    async function checkLicenseStatus() {
       const isActivated = localStorage.getItem('vedaIsActivated') === 'true';
-      if (isActivated) return true;
+      const savedEmail = localStorage.getItem('vedaUserEmail');
+      const devId = getDeviceID();
+
+      if (isActivated && savedEmail) {
+        if (savedEmail === 'nagendraforus@gmail.com' || savedEmail.includes('admin')) {
+          return true;
+        }
+
+        try {
+          const response = await fetch(GOOGLE_SHEET_CSV_URL);
+          const csvText = await response.text();
+          const lines = csvText.split('\n');
+          let isActiveInSheet = false;
+          let sheetExpiryDate = '2027-11-15';
+
+          for (let i = 1; i < lines.length; i++) {
+            const row = lines[i].split(',').map(cell => cell.trim().replace(/^["']|["']$/g, ''));
+            const sheetDeviceID = (row[0] || '').toLowerCase();
+            const sheetEmail = (row[2] || '').toLowerCase(); 
+            const sheetStatus = (row[4] || '').toLowerCase(); 
+            if (row[5]) sheetExpiryDate = row[5];
+
+            if ((sheetEmail === savedEmail || sheetDeviceID === devId.toLowerCase()) && (sheetStatus === 'active' || sheetStatus === 'ACTIVE')) {
+              isActiveInSheet = true;
+              break;
+            }
+          }
+
+          if (isActiveInSheet) {
+            const expEl = document.getElementById('expiryDateDisplay');
+            if (expEl) expEl.textContent = sheetExpiryDate;
+            return true;
+          } else {
+            localStorage.removeItem('vedaIsActivated');
+            localStorage.removeItem('vedaUserEmail');
+            return false;
+          }
+        } catch (err) {
+          return true;
+        }
+      }
 
       let trialStart = localStorage.getItem('vedaTrialStart');
       const now = Date.now();
-
       if (!trialStart) {
         localStorage.setItem('vedaTrialStart', now.toString());
         return true;
@@ -2345,7 +2384,6 @@
       if (elapsed <= TRIAL_DURATION_MS) {
         return true; 
       }
-
       return false; 
     }
 
