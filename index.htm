@@ -2329,57 +2329,79 @@
       return devId;
     }
 
-    async function checkLicenseStatus() {
-      const isActivated = localStorage.getItem('vedaIsActivated') === 'true';
-      const savedEmail = localStorage.getItem('vedaUserEmail');
-      const devId = getDeviceID();
-
-      if (!isActivated) {
-        let trialStart = localStorage.getItem('vedaTrialStart');
-        const now = Date.now();
-        if (!trialStart) {
-          localStorage.setItem('vedaTrialStart', now.toString());
-          return true;
+    // CSV ರೋ ಅನ್ನು ಸರಿಯಾಗಿ ಸ್ಪ್ಲಿಟ್ ಮಾಡಲು ರೋಬಸ್ಟ್ ಪಾರ್ಸರ್ (ತಾರಬಲ ಆಪ್‌ನಂತೆ)
+    function parseCSVRow(rowStr) {
+      const result = [];
+      let cur = "";
+      let inQuotes = false;
+      for (let i = 0; i < rowStr.length; i++) {
+        const ch = rowStr[i];
+        if (ch === '"') {
+          inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          result.push(cur.trim());
+          cur = "";
+        } else {
+          cur += ch;
         }
-        const elapsed = now - parseInt(trialStart, 10);
-        return elapsed <= TRIAL_DURATION_MS;
       }
+      result.push(cur.trim());
+      return result;
+    }
 
-      if (savedEmail === 'nagendraforus@gmail.com' || savedEmail.includes('admin')) {
-        return true;
-      }
+    async function checkLicenseStatus() {
+      const devId = getDeviceID();
+      const isActivatedLocal = localStorage.getItem('vedaIsActivated') === 'true';
 
       try {
         const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
+        if (!response.ok) return isActivatedLocal;
+        
         const csvText = await response.text();
-        const lines = csvText.split('\n');
-        let isActiveInSheet = false;
-        let sheetExpiryDate = 'ಸಕ್ರಿಯವಾಗಿದೆ';
+        const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+        let matchedRecord = null;
 
         for (let i = 1; i < lines.length; i++) {
-          const row = lines[i].split(',').map(cell => cell.trim().replace(/^["']|["']$/g, ''));
-          const sheetDeviceID = (row[0] || '').toLowerCase(); // Column A: DeviceID
-          const sheetEmail = (row[2] || '').toLowerCase();     // Column C: Email
-          if (row[3]) sheetExpiryDate = row[3];                // Column D: ExpiryDate (2030-12-31)
-          const sheetStatus = (row[4] || '').toLowerCase();     // Column E: Status (ACTIVE / INACTIVE)
+          const cols = parseCSVRow(lines[i]);
+          if (cols.length >= 5) {
+            const rowDevId = cols[0].toUpperCase().trim(); // Column A: DeviceID
+            const rowExpiry = cols[3].trim();             // Column D: ExpiryDate (2030-12-31)
+            const rowStatus = cols[4].toUpperCase().trim(); // Column E: Status (ACTIVE / INACTIVE)
 
-          if ((sheetEmail === savedEmail || sheetDeviceID === devId.toLowerCase()) && (sheetStatus === 'active' || sheetStatus === 'ACTIVE')) {
-            isActiveInSheet = true;
-            localStorage.setItem('vedaExpiryDate', sheetExpiryDate);
-            break;
+            if (rowDevId === devId.toUpperCase().trim()) {
+              matchedRecord = {
+                expiry: rowExpiry,
+                status: rowStatus
+              };
+              break;
+            }
           }
         }
 
-        if (isActiveInSheet) {
-          return true;
+        const expEl = document.getElementById('expiryDateDisplay');
+
+        if (matchedRecord) {
+          if (matchedRecord.status === 'ACTIVE') {
+            localStorage.setItem('vedaIsActivated', 'true');
+            localStorage.setItem('vedaExpiryDate', matchedRecord.expiry);
+            if (expEl) expEl.textContent = matchedRecord.expiry;
+            return true;
+          } else {
+            // ಶೀಟ್‌ನಲ್ಲಿ INACTIVE ಮಾಡಿದ್ದರೆ ತಕ್ಷಣ ಲೈಸೆನ್ಸ್ ರದ್ದುಗೊಳಿಸಿ ಲಾಕ್ ಮಾಡುವುದು
+            localStorage.removeItem('vedaIsActivated');
+            localStorage.removeItem('vedaExpiryDate');
+            if (expEl) expEl.textContent = 'Inactive / Locked';
+            return false;
+          }
         } else {
-          localStorage.removeItem('vedaIsActivated');
-          localStorage.removeItem('vedaUserEmail');
-          localStorage.removeItem('vedaExpiryDate');
-          return false;
+          return isActivatedLocal;
         }
       } catch (err) {
-        return true; 
+        // ನೆಟ್‌ವರ್ಕ್ ಸಮಸ್ಯೆ ಇದ್ದರೆ ಲೋಕಲ್ ಕ್ಯಾಶ್ ಬಳಸುವುದು
+        const savedExpiry = localStorage.getItem('vedaExpiryDate');
+        const expEl = document.getElementById('expiryDateDisplay');
+        if (expEl && savedExpiry) expEl.textContent = savedExpiry;
+        return isActivatedLocal;
       }
     }
 
@@ -2389,18 +2411,74 @@
       if (devInput) devInput.value = devId;
 
       const active = await checkLicenseStatus();
+      const modal = document.getElementById('licenseModal');
       if (!active) {
-        const modal = document.getElementById('licenseModal');
         if (modal) modal.classList.remove('hidden');
+      } else {
+        if (modal) modal.classList.add('hidden');
       }
 
+      // ಪ್ರತಿ 15 ಸೆಕೆಂಡ್‌ಗೆ ಒಮ್ಮೆ ಶೀಟ್‌ನಲ್ಲಿ ಇನ್‌ಆಕ್ಟಿವ್ ಮಾಡಿದ್ದಾರಾ ಎಂದು ಲೈವ್ ಚೆಕ್ ಮಾಡುವುದು
       setInterval(async () => {
-        const active = await checkLicenseStatus();
-        if (!active) {
-          const modal = document.getElementById('licenseModal');
+        const isActiveNow = await checkLicenseStatus();
+        if (!isActiveNow) {
           if (modal) modal.classList.remove('hidden');
         }
       }, 15000);
+    }
+
+    async function verifyAndActivateLicenseFromSheet() {
+      const emailInput = document.getElementById('licenseEmailInput').value.trim().toLowerCase();
+      const devId = document.getElementById('licenseDeviceInput').value.trim().toUpperCase();
+
+      if (!emailInput) {
+        alert("ದಯವಿಟ್ಟು ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸ ನಮೂದಿಸಿ.");
+        return;
+      }
+
+      try {
+        showToast("ಗೂಗಲ್ ಶೀಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
+        const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
+        const csvText = await response.text();
+        const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+        
+        let matchedRecord = null;
+
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCSVRow(lines[i]);
+          if (cols.length >= 5) {
+            const rowDevId = cols[0].toUpperCase().trim();
+            const rowExpiry = cols[3].trim();
+            const rowStatus = cols[4].toUpperCase().trim();
+
+            if (rowDevId === devId) {
+              matchedRecord = {
+                expiry: rowExpiry,
+                status: rowStatus
+              };
+              break;
+            }
+          }
+        }
+
+        if (matchedRecord && matchedRecord.status === 'ACTIVE') {
+          localStorage.setItem('vedaIsActivated', 'true');
+          localStorage.setItem('vedaUserEmail', emailInput);
+          localStorage.setItem('vedaExpiryDate', matchedRecord.expiry);
+          
+          const expEl = document.getElementById('expiryDateDisplay');
+          if (expEl) expEl.textContent = matchedRecord.expiry;
+
+          document.getElementById('licenseModal').classList.add('hidden');
+          showToast("ಲೈಸೆನ್ಸ್ ಗೂಗಲ್ ಶೀಟ್ ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಆಕ್ಟಿವೇಟ್ ಆಯಿತು!");
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          alert("ದೋಷ: ಈ ಡಿವೈಸ್ ಐಡಿ ಗೂಗಲ್ ಶೀಟ್‌ನಲ್ಲಿ 'ACTIVE' ಸ್ಥಿತಿಯಲ್ಲಿಲ್ಲ ಅಥವಾ ನೋಂದಾಯಿಸಿಲ್ಲ.");
+        }
+      } catch (err) {
+        console.error("Sheet Fetch Error:", err);
+        alert("ಗೂಗಲ್ ಶೀಟ್ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ.");
+      }
     }
 
     async function verifyAndActivateLicenseFromSheet() {
