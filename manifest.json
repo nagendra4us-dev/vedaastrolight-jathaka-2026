@@ -1,0 +1,16 @@
+{
+  "name": "Veda Astrolight - ಜಾತಕ ಗಣಕ",
+  "short_name": "VedaAstrolight",
+  "description": "ಗ್ರಹ ಸಮಯ ಹಾಗೂ ಜಾತಕ ಗಣಕ ವ್ಯವಸ್ಥೆ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6faf7",
+  "theme_color": "#1f5038",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
