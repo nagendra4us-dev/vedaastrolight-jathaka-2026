@@ -170,7 +170,6 @@
     <button onclick="showLicenseInfoModal()" id="license-status-pill" class="px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-300 font-bold flex items-center gap-1 shadow-sm text-xs">
         <span>🔑</span> <span id="license-pill-text">ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...</span>
     </button>
-</span>
           </div>
         </div>
       </div>
@@ -2327,726 +2326,203 @@
     });
   </script>
 
-  <!-- LICENSE & 15-MIN TRIAL ACTIVATION MODAL -->
-  <div id="licenseModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-200 space-y-4">
-      <div class="text-center space-y-1">
-        <div class="om-badge w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-amber-300 text-2xl font-bold select-none">ॐ</div>
-        <h3 class="text-lg font-bold text-emerald-950 brand-font">ವೇದ ಆಸ್ಟ್ರೋ ಲೈಟ್ ಜಾತಕ</h3>
-        <p class="text-xs text-emerald-700">ಲೈಸೆನ್ಸ್ ಸಕ್ರಿಯಗೊಳಿಸುವಿಕೆ (Google Sheet Connected)</p>
-      </div>
-
-      <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200 text-xs text-emerald-900 space-y-1.5">
-        <div class="font-bold flex items-center justify-between">
-          <span>ಟ್ರಯಲ್ ಅವಧಿ ಮುಕ್ತಾಯಗೊಂಡಿದೆ</span>
-          <span id="trialStatusBadge" class="px-2 py-0.5 bg-amber-200 text-amber-950 rounded font-mono text-[10px]">15 ನಿಮಿಷಗಳು ಮುಗಿದಿವೆ</span>
-        </div>
-        <p class="text-[11px] text-emerald-800">ಆಪ್ ಮುಂದುವರಿಸಲು ನಿಮ್ಮ ಗೂಗಲ್ ಶೀಟ್‌ನಲ್ಲಿ ನೋಂದಾಯಿಸಿದ ಇಮೇಲ್ ನಮೂದಿಸಿ (ಸಂಪರ್ಕ: 7349577177).</p>
-      </div>
-
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block font-semibold text-emerald-900 mb-1">ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸ (Email in Sheet)</label>
-          <input type="email" id="licenseEmailInput" placeholder="nagendraforus@gmail.com" class="w-full px-3 py-2 rounded-xl border border-emerald-300 focus:outline-none focus:ring-1 focus:ring-emerald-600 bg-white font-mono">
-        </div>
-        <div>
-          <label class="block font-semibold text-emerald-900 mb-1 flex justify-between">
-            <span>ಡಿವೈಸ್ ಐಡಿ (Device ID)</span>
-            <span class="text-[10px] text-emerald-600">ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸಿದ್ಧಗೊಂಡಿದೆ</span>
-          </label>
-          <input type="text" id="licenseDeviceInput" readonly class="w-full px-3 py-2 rounded-xl border border-emerald-200 bg-gray-50 text-gray-700 font-mono text-xs">
-        </div>
-      </div>
-
-      <div class="space-y-2 pt-2">
-        <button onclick="verifyAndActivateLicenseFromSheet()" class="w-full py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl font-bold transition shadow-xs cursor-pointer flex items-center justify-center gap-2">
-          <span>ಗೂಗಲ್ ಶೀಟ್ ಮೂಲಕ ಆಕ್ಟಿವೇಟ್ ಮಾಡಿ</span>
-        </button>
-        <div class="flex justify-between items-center text-[11px] text-emerald-800 pt-1">
-          <span>ಸಂಪರ್ಕ: 7349577177</span>
-          <a href="https://docs.google.com/spreadsheets/d/1WnXKgb6vUtHZLBVa3Zrg5PinKRQrbRwkjvAkIhfCoN8/edit?usp=drivesdk" target="_blank" class="underline font-semibold">ಗೂಗಲ್ ಶೀಟ್ ಮ್ಯಾನೇಜರ್</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // 15-Minute Trial & Live Google Sheet License Verification System & Service Worker
-    const TRIAL_DURATION_MS = 15 * 60 * 1000; // 15 minutes
-    const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WnXKgb6vUtHZLBVa3Zrg5PinKRQrbRwkjvAkIhfCoN8/export?format=csv';
+    <script>
+    // ==================== GOOGLE SHEET LICENSE CONTROL ENGINE ====================
+    const NEW_SHEET_ID = "15b20sLV9h_2avk4ofhHXm9NsmjYS-MUAMmEOUfQXycA";
+    const APP_DISPLAY_NAME = "Veda Astrolight - Graha Samaya & Jataka";
+    const LICENSE_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${NEW_SHEET_ID}/gviz/tq?tqx=out:csv`;
+    const STORAGE_PREFIX = "veda_jataka_samaya_";
 
     function getOrCreateDeviceId() {
-    let devId = localStorage.getItem("veda_device_id");
-    if (!devId) {
-        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        let rand = "";
-        for (let i = 0; i < 5; i++) {
-            rand += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        devId = "VA-" + rand;
-        localStorage.setItem("veda_device_id", devId);
-    }
-    return devId;
-}
-
-function parseCSVRow(rowStr) {
-    const result = [];
-    let cur = "";
-    let inQuotes = false;
-    for (let i = 0; i < rowStr.length; i++) {
-        const ch = rowStr[i];
-        if (ch === '"') {
-            inQuotes = !inQuotes;
-        } else if (ch === ',' && !inQuotes) {
-            result.push(cur.trim());
-            cur = "";
-        } else {
-            cur += ch;
-        }
-    }
-    result.push(cur.trim());
-    return result;
-}
-
-async function checkLicenseStatus() {
-    const devId = getOrCreateDeviceId();
-    const pillEl = document.getElementById('license-status-pill');
-    const pillTextEl = document.getElementById('license-pill-text');
-    const lockOverlay = document.getElementById('license-lock-overlay');
-    const lockDeviceEl = document.getElementById('lock-device-id');
-    const lockMsgEl = document.getElementById('lock-status-msg');
-
-    if (lockDeviceEl) lockDeviceEl.textContent = devId;
-
-    try {
-        const res = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + Date.now());
-        if (!res.ok) return false;
-
-        const csvText = await res.text();
-        const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
-        let matchedRecord = null;
-
-        for (let i = 1; i < lines.length; i++) {
-            const cols = parseCSVRow(lines[i]);
-            if (cols.length >= 5) {
-                const rowDevId = cols[0].toUpperCase().trim();
-                const rowExpiry = cols[3].trim();
-                const rowStatus = cols[4].toUpperCase().trim();
-
-                if (rowDevId === devId.toUpperCase()) {
-                    matchedRecord = {
-                        expiry: rowExpiry,
-                        status: rowStatus
-                    };
-                    break;
-                }
-            }
-        }
-
-        if (matchedRecord) {
-            if (matchedRecord.status === "ACTIVE") {
-                localStorage.setItem("vedaIsActivated", "true");
-                localStorage.setItem("vedaExpiryDate", matchedRecord.expiry);
-                
-                if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1 shadow-sm";
-                if (pillTextEl) pillTextEl.textContent = `Licensed (${matchedRecord.expiry})`;
-                if (lockOverlay) lockOverlay.classList.add("hidden");
-                return true;
-            } else {
-                localStorage.removeItem("vedaIsActivated");
-                localStorage.removeItem("vedaExpiryDate");
-
-                if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1 shadow-sm";
-                if (pillTextEl) pillTextEl.textContent = "Inactive / Locked";
-                if (lockMsgEl) lockMsgEl.textContent = "⚠️ ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ಸ್ಥಿತಿ ಇನ್‌ಆಕ್ಟಿವ್ (INACTIVE) ಆಗಿದೆ.";
-                if (lockOverlay) lockOverlay.classList.remove("hidden");
-                return false;
-            }
-        } else {
-            localStorage.removeItem("vedaIsActivated");
-            localStorage.removeItem("vedaExpiryDate");
-
-            if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1 shadow-sm";
-            if (pillTextEl) pillTextEl.textContent = "Activation Required";
-            if (lockOverlay) lockOverlay.classList.remove("hidden");
-            return false;
-        }
-    } catch (err) {
-        const isLocalActive = localStorage.getItem("vedaIsActivated") === "true";
-        const savedExpiry = localStorage.getItem("vedaExpiryDate");
-        if (isLocalActive && savedExpiry) {
-            if (pillTextEl) pillTextEl.textContent = `Licensed (${savedExpiry})`;
-            if (lockOverlay) lockOverlay.classList.add("hidden");
-            return true;
-        }
-        if (lockOverlay) lockOverlay.classList.remove("hidden");
-        return false;
-    }
-}
-
-async function initLicenseSystem() {
-    const devId = getOrCreateDeviceId();
-    const lockDeviceEl = document.getElementById('lock-device-id');
-    if (lockDeviceEl) lockDeviceEl.textContent = devId;
-
-    await checkLicenseStatus();
-
-    setInterval(async () => {
-        await checkLicenseStatus();
-    }, 15000);
-}
-    async function initLicenseSystem() {
-      const devId = getDeviceID();
-      const devInput = document.getElementById('licenseDeviceInput');
-      if (devInput) devInput.value = devId;
-
-      await checkLicenseStatus();
-
-      // ಪ್ರತಿ 10 ಸೆಕೆಂಡ್‌ಗೆ ಒಮ್ಮೆ ಶೀಟ್‌ನಲ್ಲಿ ಇನ್‌ಆಕ್ಟಿವ್ ಮಾಡಿದ್ದಾರಾ ಎಂದು ಲೈವ್ ಚೆಕ್ ಮಾಡುವುದು
-      setInterval(async () => {
-        await checkLicenseStatus();
-      }, 10000);
-    }
-
-    async function verifyAndActivateLicenseFromSheet() {
-      const devIdInput = document.getElementById('licenseDeviceInput');
-      const devId = devIdInput ? devIdInput.value.trim().toUpperCase() : getDeviceID();
-
+      let devId = localStorage.getItem(STORAGE_PREFIX + "device_id");
       if (!devId) {
-        alert("ಡಿವೈಸ್ ಐಡಿ ಲಭ್ಯವಿಲ್ಲ.");
-        return;
-      }
-
-      try {
-        showToast("ಗೂಗಲ್ ಶೀಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
-        const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
-        const csvText = await response.text();
-        const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
-        
-        let matchedRecord = null;
-
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCSVRow(lines[i]);
-          if (cols.length >= 5) {
-            const rowDevId = cols[0].toUpperCase().trim();
-            const rowExpiry = cols[3].trim();
-            const rowStatus = cols[4].toUpperCase().trim();
-
-            if (rowDevId === devId) {
-              matchedRecord = {
-                expiry: rowExpiry,
-                status: rowStatus
-              };
-              break;
-            }
-          }
-        }
-
-        if (matchedRecord && matchedRecord.status === 'ACTIVE') {
-          localStorage.setItem('vedaIsActivated', 'true');
-          localStorage.setItem('vedaExpiryDate', matchedRecord.expiry);
-          
-          const expEl = document.getElementById('expiryDateDisplay');
-          if (expEl) expEl.textContent = matchedRecord.expiry;
-
-          const modal = document.getElementById('licenseModal');
-          if (modal) modal.classList.add('hidden');
-
-          showToast("ಲೈಸೆನ್ಸ್ ಗೂಗಲ್ ಶೀಟ್ ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಆಕ್ಟಿವೇಟ್ ಆಯಿತು!");
-          setTimeout(() => location.reload(), 1000);
-        } else {
-          alert("ದೋಷ: ಈ ಡಿವೈಸ್ ಐಡಿ ಗೂಗಲ್ ಶೀಟ್‌ನಲ್ಲಿ 'ACTIVE' ಸ್ಥಿತಿಯಲ್ಲಿಲ್ಲ ಅಥವಾ ನೋಂದಾಯಿಸಿಲ್ಲ.");
-        }
-      } catch (err) {
-        console.error("Sheet Fetch Error:", err);
-        alert("ಗೂಗಲ್ ಶೀಟ್ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ.");
-      }
-    }
-    async function initLicenseSystem() {
-      const devId = getDeviceID();
-      const devInput = document.getElementById('licenseDeviceInput');
-      if (devInput) devInput.value = devId;
-
-      const active = await checkLicenseStatus();
-      const modal = document.getElementById('licenseModal');
-      if (!active) {
-        if (modal) modal.classList.remove('hidden');
-      } else {
-        if (modal) modal.classList.add('hidden');
-      }
-
-      // ಪ್ರತಿ 15 ಸೆಕೆಂಡ್‌ಗೆ ಒಮ್ಮೆ ಶೀಟ್‌ನಲ್ಲಿ ಇನ್‌ಆಕ್ಟಿವ್ ಮಾಡಿದ್ದಾರಾ ಎಂದು ಲೈವ್ ಚೆಕ್ ಮಾಡುವುದು
-      setInterval(async () => {
-        const isActiveNow = await checkLicenseStatus();
-        if (!isActiveNow) {
-          if (modal) modal.classList.remove('hidden');
-        }
-      }, 15000);
-    }
-
-    async function verifyAndActivateLicenseFromSheet() {
-      const emailInput = document.getElementById('licenseEmailInput').value.trim().toLowerCase();
-      const devId = document.getElementById('licenseDeviceInput').value.trim().toUpperCase();
-
-      if (!emailInput) {
-        alert("ದಯವಿಟ್ಟು ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸ ನಮೂದಿಸಿ.");
-        return;
-      }
-
-      try {
-        showToast("ಗೂಗಲ್ ಶೀಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
-        const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
-        const csvText = await response.text();
-        const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
-        
-        let matchedRecord = null;
-
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCSVRow(lines[i]);
-          if (cols.length >= 5) {
-            const rowDevId = cols[0].toUpperCase().trim();
-            const rowExpiry = cols[3].trim();
-            const rowStatus = cols[4].toUpperCase().trim();
-
-            if (rowDevId === devId) {
-              matchedRecord = {
-                expiry: rowExpiry,
-                status: rowStatus
-              };
-              break;
-            }
-          }
-        }
-
-        if (matchedRecord && matchedRecord.status === 'ACTIVE') {
-          localStorage.setItem('vedaIsActivated', 'true');
-          localStorage.setItem('vedaUserEmail', emailInput);
-          localStorage.setItem('vedaExpiryDate', matchedRecord.expiry);
-          
-          const expEl = document.getElementById('expiryDateDisplay');
-          if (expEl) expEl.textContent = matchedRecord.expiry;
-
-          document.getElementById('licenseModal').classList.add('hidden');
-          showToast("ಲೈಸೆನ್ಸ್ ಗೂಗಲ್ ಶೀಟ್ ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಆಕ್ಟಿವೇಟ್ ಆಯಿತು!");
-          setTimeout(() => location.reload(), 1000);
-        } else {
-          alert("ದೋಷ: ಈ ಡಿವೈಸ್ ಐಡಿ ಗೂಗಲ್ ಶೀಟ್‌ನಲ್ಲಿ 'ACTIVE' ಸ್ಥಿತಿಯಲ್ಲಿಲ್ಲ ಅಥವಾ ನೋಂದಾಯಿಸಿಲ್ಲ.");
-        }
-      } catch (err) {
-        console.error("Sheet Fetch Error:", err);
-        alert("ಗೂಗಲ್ ಶೀಟ್ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ.");
-      }
-    }
-
-    async function verifyAndActivateLicenseFromSheet() {
-      const emailInput = document.getElementById('licenseEmailInput').value.trim().toLowerCase();
-      const devId = document.getElementById('licenseDeviceInput').value.trim();
-
-      if (!emailInput) {
-        alert("ದಯವಿಟ್ಟು ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸ ನಮೂದಿಸಿ.");
-        return;
-      }
-
-      if (emailInput === 'nagendraforus@gmail.com' || devId === 'VA Admin' || emailInput.includes('admin')) {
-        localStorage.setItem('vedaIsActivated', 'true');
-        localStorage.setItem('vedaUserEmail', emailInput);
-        document.getElementById('licenseModal').classList.add('hidden');
-        showToast("ಅಡ್ಮಿನಿಸ್ಟ್ರೇಟರ್ ಲೈಸೆನ್ಸ್ ಯಶಸ್ವಿಯಾಗಿ ಸಕ್ರಿಯಗೊಂಡಿದೆ!");
-        setTimeout(() => location.reload(), 1000);
-        return;
-      }
-
-      try {
-        showToast("ಗೂಗಲ್ ಶೀಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
-        const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
-        const csvText = await response.text();
-        
-        const lines = csvText.split('\n');
-        let isFoundAndActive = false;
-        let sheetExpiryDate = 'ಸಕ್ರಿಯವಾಗಿದೆ';
-
-        for (let i = 1; i < lines.length; i++) {
-          const row = lines[i].split(',').map(cell => cell.trim().replace(/^["']|["']$/g, ''));
-          const sheetDeviceID = (row[0] || '').toLowerCase(); // Column A: DeviceID
-          const sheetEmail = (row[2] || '').toLowerCase();     // Column C: Email
-          if (row[3]) sheetExpiryDate = row[3];                // Column D: ExpiryDate
-          const sheetStatus = (row[4] || '').toLowerCase();     // Column E: Status
-
-          if ((sheetEmail === emailInput || sheetDeviceID === devId.toLowerCase()) && (sheetStatus === 'active' || sheetStatus === 'ACTIVE')) {
-            isFoundAndActive = true;
-            localStorage.setItem('vedaExpiryDate', sheetExpiryDate);
-            break;
-          }
-        }
-
-        if (isFoundAndActive) {
-          localStorage.setItem('vedaIsActivated', 'true');
-          localStorage.setItem('vedaUserEmail', emailInput);
-          document.getElementById('licenseModal').classList.add('hidden');
-          showToast("ಲೈಸೆನ್ಸ್ ಗೂಗಲ್ ಶೀಟ್ ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಆಕ್ಟಿವೇಟ್ ಆಯಿತು!");
-          setTimeout(() => location.reload(), 1000);
-        } else {
-          alert("ದೋಷ: ಈ ಇಮೇಲ್ ಗೂಗಲ್ ಶೀಟ್‌ನಲ್ಲಿ 'ACTIVE' ಸ್ಥಿತಿಯಲ್ಲಿಲ್ಲ ಅಥವಾ ನೋಂದಾಯಿಸಿಲ್ಲ.");
-        }
-      } catch (err) {
-        console.error("Sheet Fetch Error:", err);
-        alert("ಗೂಗಲ್ ಶೀಟ್ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ.");
-      }
-    }
-
-    async function verifyAndActivateLicenseFromSheet() {
-      const emailInput = document.getElementById('licenseEmailInput').value.trim().toLowerCase();
-      const devId = document.getElementById('licenseDeviceInput').value.trim();
-
-      if (!emailInput) {
-        alert("ದಯವಿಟ್ಟು ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸ ನಮೂದಿಸಿ.");
-        return;
-      }
-
-      if (emailInput === 'nagendraforus@gmail.com' || devId === 'VA Admin' || emailInput.includes('admin')) {
-        localStorage.setItem('vedaIsActivated', 'true');
-        localStorage.setItem('vedaUserEmail', emailInput);
-        document.getElementById('licenseModal').classList.add('hidden');
-        showToast("ಅಡ್ಮಿನಿಸ್ಟ್ರೇಟರ್ ಲೈಸೆನ್ಸ್ ಯಶಸ್ವಿಯಾಗಿ ಸಕ್ರಿಯಗೊಂಡಿದೆ!");
-        setTimeout(() => location.reload(), 1000);
-        return;
-      }
-
-      try {
-        showToast("ಗೂಗಲ್ ಶೀಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
-        const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
-        const csvText = await response.text();
-        
-        const lines = csvText.split('\n');
-        let isFoundAndActive = false;
-        let sheetExpiryDate = 'ಸಕ್ರಿಯವಾಗಿದೆ';
-
-        for (let i = 1; i < lines.length; i++) {
-          const row = lines[i].split(',').map(cell => cell.trim().replace(/^["']|["']$/g, ''));
-          const sheetDeviceID = (row[0] || '').toLowerCase();
-          const sheetEmail = (row[2] || '').toLowerCase(); 
-          const sheetStatus = (row[4] || '').toLowerCase(); 
-          if (row[5]) sheetExpiryDate = row[5];
-
-          if ((sheetEmail === emailInput || sheetDeviceID === devId.toLowerCase()) && (sheetStatus === 'active' || sheetStatus === 'ACTIVE')) {
-            isFoundAndActive = true;
-            localStorage.setItem('vedaExpiryDate', sheetExpiryDate);
-            break;
-          }
-        }
-
-        if (isFoundAndActive) {
-          localStorage.setItem('vedaIsActivated', 'true');
-          localStorage.setItem('vedaUserEmail', emailInput);
-          document.getElementById('licenseModal').classList.add('hidden');
-          showToast("ಲೈಸೆನ್ಸ್ ಗೂಗಲ್ ಶೀಟ್ ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಆಕ್ಟಿವೇಟ್ ಆಯಿತು!");
-          setTimeout(() => location.reload(), 1000);
-        } else {
-          alert("ದೋಷ: ಈ ಇಮೇಲ್ ಗೂಗಲ್ ಶೀಟ್‌ನಲ್ಲಿ 'ACTIVE' ಸ್ಥಿತಿಯಲ್ಲಿಲ್ಲ ಅಥವಾ ನೋಂದಾಯಿಸಿಲ್ಲ.");
-        }
-      } catch (err) {
-        console.error("Sheet Fetch Error:", err);
-        alert("ಗೂಗಲ್ ಶೀಟ್ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ.");
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      await initLicenseSystem();
-
-      const savedExpiry = localStorage.getItem('vedaExpiryDate');
-      const expEl = document.getElementById('expiryDateDisplay');
-      if (expEl) {
-        if (savedExpiry) {
-          expEl.textContent = savedExpiry;
-        } else {
-          expEl.textContent = '2027-11-15';
-        }
-      }
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed', err));
-      }
-    });
-
-    async function verifyAndActivateLicenseFromSheet() {
-      const emailInput = document.getElementById('licenseEmailInput').value.trim().toLowerCase();
-      const devId = document.getElementById('licenseDeviceInput').value.trim();
-
-      if (!emailInput) {
-        alert("ದಯವಿಟ್ಟು ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸ ನಮೂದಿಸಿ.");
-        return;
-      }
-
-      if (emailInput === 'nagendraforus@gmail.com' || devId === 'VA Admin' || emailInput.includes('admin')) {
-        localStorage.setItem('vedaIsActivated', 'true');
-        localStorage.setItem('vedaUserEmail', emailInput);
-        document.getElementById('licenseModal').classList.add('hidden');
-        showToast("ಅಡ್ಮಿನಿಸ್ಟ್ರೇಟರ್ ಲೈಸೆನ್ಸ್ ಯಶಸ್ವಿಯಾಗಿ ಸಕ್ರಿಯಗೊಂಡಿದೆ!");
-        return;
-      }
-
-      try {
-        showToast("ಗೂಗಲ್ ಶೀಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
-        const response = await fetch(GOOGLE_SHEET_CSV_URL);
-        const csvText = await response.text();
-        
-        const lines = csvText.split('\n');
-        let isFoundAndActive = false;
-
-        for (let i = 1; i < lines.length; i++) {
-          const row = lines[i].split(',').map(cell => cell.trim().replace(/^["']|["']$/g, ''));
-          const sheetEmail = (row[0] || '').toLowerCase();
-          const sheetStatus = (row[4] || '').toLowerCase();
-
-          if (sheetEmail === emailInput && sheetStatus === 'active') {
-            isFoundAndActive = true;
-            break;
-          }
-        }
-
-        if (isFoundAndActive) {
-          localStorage.setItem('vedaIsActivated', 'true');
-          localStorage.setItem('vedaUserEmail', emailInput);
-          document.getElementById('licenseModal').classList.add('hidden');
-          showToast("ಲೈಸೆನ್ಸ್ ಗೂಗಲ್ ಶೀಟ್ ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಆಕ್ಟಿವೇಟ್ ಆಯಿತು!");
-        } else {
-          alert("ದೋಷ: ಈ ಇಮೇಲ್ ಗೂಗಲ್ ಶೀಟ್‌ನಲ್ಲಿ 'Active' ಸ್ಥಿತಿಯಲ್ಲಿಲ್ಲ ಅಥವಾ ನೋಂದಾಯಿಸಿಲ್ಲ.");
-        }
-      } catch (err) {
-        console.error("Sheet Fetch Error:", err);
-        alert("ಗೂಗಲ್ ಶೀಟ್ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ.");
-      }
-    }
-async function verifyAndActivateLicenseFromSheet() {
-  const emailInput = document.getElementById('licenseEmailInput').value.trim().toLowerCase();
-  const devId = document.getElementById('licenseDeviceInput').value.trim();
-
-  if (!emailInput) {
-    alert("ದಯವಿಟ್ಟು ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸ ನಮೂದಿಸಿ.");
-    return;
-  }
-
-  if (emailInput === 'nagendraforus@gmail.com' || devId === 'VA Admin' || emailInput.includes('admin')) {
-    localStorage.setItem('vedaIsActivated', 'true');
-    localStorage.setItem('vedaUserEmail', emailInput);
-    document.getElementById('licenseModal').classList.add('hidden');
-    showToast("ಅಡ್ಮಿನಿಸ್ಟ್ರೇಟರ್ ಲೈಸೆನ್ಸ್ ಯಶಸ್ವಿಯಾಗಿ ಸಕ್ರಿಯಗೊಂಡಿದೆ!");
-    setTimeout(() => location.reload(), 1000);
-    return;
-  }
-
-  try {
-    showToast("ಗೂಗಲ್ ಶೀಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
-    const response = await fetch(GOOGLE_SHEET_CSV_URL);
-    const csvText = await response.text();
-    
-    const lines = csvText.split('\n');
-    let isFoundAndActive = false;
-
-    for (let i = 1; i < lines.length; i++) {
-      const row = lines[i].split(',').map(cell => cell.trim().replace(/^["']|["']$/g, ''));
-      const sheetDeviceID = (row[0] || '').toLowerCase();
-      const sheetEmail = (row[2] || '').toLowerCase(); 
-      const sheetStatus = (row[4] || '').toLowerCase(); 
-
-      if ((sheetEmail === emailInput || sheetDeviceID === devId.toLowerCase()) && (sheetStatus === 'active' || sheetStatus === 'ACTIVE')) {
-        isFoundAndActive = true;
-        break;
-      }
-    }
-
-   <script>
-// ==================== GOOGLE SHEET LICENSE CONTROL ENGINE ====================
-const NEW_SHEET_ID = "YOUR_EXISTING_GOOGLE_SHEET_ID_HERE"; // <-- ಇಲ್ಲಿ ನಿಮ್ಮ ಸರಿಯಾದ Google Sheet ID ಹಾಕಿ
-const APP_DISPLAY_NAME = "Veda Astrolight";
-const LICENSE_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${NEW_SHEET_ID}/gviz/tq?tqx=out:csv`;
-const STORAGE_PREFIX = "veda_app2_";
-
-function getOrCreateDeviceId() {
-    let devId = localStorage.getItem(STORAGE_PREFIX + "device_id");
-    if (!devId) {
         const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         let rand = "";
         for (let i = 0; i < 5; i++) {
-            rand += chars.charAt(Math.floor(Math.random() * chars.length));
+          rand += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         devId = "VA-" + rand;
         localStorage.setItem(STORAGE_PREFIX + "device_id", devId);
+      }
+      return devId;
     }
-    return devId;
-}
 
-function parseCSVRow(rowStr) {
-    const result = [];
-    let cur = "", inQuotes = false;
-    for (let i = 0; i < rowStr.length; i++) {
+    function parseCSVRow(rowStr) {
+      const result = [];
+      let cur = "", inQuotes = false;
+      for (let i = 0; i < rowStr.length; i++) {
         const ch = rowStr[i];
         if (ch === '"') inQuotes = !inQuotes;
         else if (ch === ',' && !inQuotes) { result.push(cur.trim()); cur = ""; }
         else cur += ch;
+      }
+      result.push(cur.trim());
+      return result;
     }
-    result.push(cur.trim());
-    return result;
-}
 
-function normalizeDateToISO(dateStr) {
-    if (!dateStr) return "";
-    const clean = dateStr.replace(/\//g, "-").trim();
-    const parts = clean.split("-");
-    if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+    function normalizeDateToISO(dateStr) {
+      if (!dateStr) return "";
+      const clean = dateStr.replace(/\//g, "-").trim();
+      const parts = clean.split("-");
+      if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
         return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return clean;
     }
-    return clean;
-}
 
-function copyDeviceId() {
-    const devId = getOrCreateDeviceId();
-    navigator.clipboard.writeText(devId).then(() => {
+    function copyDeviceId() {
+      const devId = getOrCreateDeviceId();
+      navigator.clipboard.writeText(devId).then(() => {
         alert("ನಿಮ್ಮ Device ID (" + devId + ") ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!");
-    });
-}
+      });
+    }
 
-function requestActivationWhatsApp() {
-    const devId = getOrCreateDeviceId();
-    const uName = document.getElementById("lic-user-name").value.trim() || "ಹೆಸರು ನಮೂದಿಸಿಲ್ಲ";
-    const uEmail = document.getElementById("lic-user-email").value.trim() || "ಇಮೇಲ್ ನಮೂದಿಸಿಲ್ಲ";
-    localStorage.setItem(STORAGE_PREFIX + "lic_name", uName);
-    localStorage.setItem(STORAGE_PREFIX + "lic_email", uEmail);
+    function requestActivationWhatsApp() {
+      const devId = getOrCreateDeviceId();
+      const uName = document.getElementById("lic-user-name").value.trim() || "ಹೆಸರು ನಮೂದಿಸಿಲ್ಲ";
+      const uEmail = document.getElementById("lic-user-email").value.trim() || "ಇಮೇಲ್ ನಮೂದಿಸಿಲ್ಲ";
+      localStorage.setItem(STORAGE_PREFIX + "lic_name", uName);
+      localStorage.setItem(STORAGE_PREFIX + "lic_email", uEmail);
 
-    const msg = `ನಮಸ್ಕಾರ ಸತ್ಯಬೋಧರೇ (${APP_DISPLAY_NAME}),%0Aನನಗೆ 1 ವರ್ಷದ ಲೈಸೆನ್ಸ್ ಆಕ್ಟಿವೇಶನ್ ಬೇಕಾಗಿದೆ.%0A%0A• Device ID: *${devId}*%0A• ಹೆಸರು: ${encodeURIComponent(uName)}%0A• ಇಮೇಲ್: ${encodeURIComponent(uEmail)}%0A%0Aದಯವಿಟ್ಟು ಆಕ್ಟಿವೇಟ್ ಮಾಡಿಕೊಡಿ.`;
-    window.open(`https://wa.me/917349577177?text=${msg}`, "_blank");
-}
+      const msg = `ನಮಸ್ಕಾರ ಸತ್ಯಬೋಧರೇ (${APP_DISPLAY_NAME}),%0Aನನಗೆ 1 ವರ್ಷದ ಲೈಸೆನ್ಸ್ ಆಕ್ಟಿವೇಶನ್ ಬೇಕಾಗಿದೆ.%0A%0A• Device ID: *${devId}*%0A• ಹೆಸರು: ${encodeURIComponent(uName)}%0A• ಇಮೇಲ್: ${encodeURIComponent(uEmail)}%0A%0Aದಯವಿಟ್ಟು ಆಕ್ಟಿವೇಟ್ ಮಾಡಿಕೊಡಿ.`;
+      window.open(`https://wa.me/917349577177?text=${msg}`, "_blank");
+    }
 
-function activateFreeTrial() {
-    if (localStorage.getItem(STORAGE_PREFIX + "trial_used") === "true") {
+    function activateFreeTrial() {
+      if (localStorage.getItem(STORAGE_PREFIX + "trial_used") === "true") {
         alert("ನಿಮ್ಮ 15 ನಿಮಿಷಗಳ ಉಚಿತ ಟ್ರಯಲ್ ಈಗಾಗಲೇ ಬಳಕೆಯಾಗಿದೆ. ಮುಂದುವರಿಯಲು WhatsApp ಮೂಲಕ ಆಕ್ಟಿವೇಶನ್ ಪಡೆಯಿರಿ.");
         return;
+      }
+      const expiryTs = Date.now() + (15 * 60 * 1000);
+      localStorage.setItem(STORAGE_PREFIX + "trial_used", "true");
+      localStorage.setItem(STORAGE_PREFIX + "trial_expiry", String(expiryTs));
+      verifyLicenseNow(false);
     }
-    // ನಿಖರವಾಗಿ 15 ನಿಮಿಷಗಳ ಟ್ರಯಲ್ ಅವಧಿ
-    const expiryTs = Date.now() + (15 * 60 * 1000);
-    localStorage.setItem(STORAGE_PREFIX + "trial_used", "true");
-    localStorage.setItem(STORAGE_PREFIX + "trial_expiry", String(expiryTs));
-    verifyLicenseNow(false);
-}
 
-function showLicenseInfoModal() {
-    const devId = getOrCreateDeviceId();
-    const cachedLic = JSON.parse(localStorage.getItem(STORAGE_PREFIX + "license_cache") || "null");
-    const trialExp = parseInt(localStorage.getItem(STORAGE_PREFIX + "trial_expiry") || "0");
-    let info = `ನಿಮ್ಮ Device ID: ${devId}\n`;
-    
-    if (cachedLic && cachedLic.status === "ACTIVE") {
+    function showLicenseInfoModal() {
+      const devId = getOrCreateDeviceId();
+      const cachedLic = JSON.parse(localStorage.getItem(STORAGE_PREFIX + "license_cache") || "null");
+      const trialExp = parseInt(localStorage.getItem(STORAGE_PREFIX + "trial_expiry") || "0");
+      let info = `ನಿಮ್ಮ Device ID: ${devId}\n`;
+
+      if (cachedLic && cachedLic.status === "ACTIVE") {
         info += `ಸ್ಥಿತಿ: ಸಕ್ರಿಯ (ACTIVE)\nಕೊನೆಯ ದಿನಾಂಕ: ${cachedLic.expiry}`;
-    } else if (trialExp > Date.now()) {
+      } else if (trialExp > Date.now()) {
         const minsLeft = Math.ceil((trialExp - Date.now()) / 60000);
         info += `ಸ್ಥಿತಿ: 15-Min Free Trial (ಇನ್ನು ${minsLeft} ನಿಮಿಷ ಬಾಕಿ ಇದೆ)`;
-    } else {
+      } else {
         info += `ಸ್ಥಿತಿ: ಲೈಸೆನ್ಸ್ ಸಕ್ರಿಯವಾಗಿಲ್ಲ`;
-    }
-    
-    if (confirm(info + "\n\nಲೈಸೆನ್ಸ್ ಪರಿಶೀಲಿಸಲು ಅಥವಾ ಆಕ್ಟಿವೇಶನ್ ಪರದೆ ತೆರೆಯಲು OK ಒತ್ತಿ.")) {
+      }
+
+      if (confirm(info + "\n\nಲೈಸೆನ್ಸ್ ಪರಿಶೀಲಿಸಲು ಅಥವಾ ಆಕ್ಟಿವೇಶನ್ ಪರದೆ ತೆರೆಯಲು OK ಒತ್ತಿ.")) {
         document.getElementById("lock-device-id").textContent = devId;
         document.getElementById("lic-user-name").value = localStorage.getItem(STORAGE_PREFIX + "lic_name") || "";
         document.getElementById("lic-user-email").value = localStorage.getItem(STORAGE_PREFIX + "lic_email") || "";
         document.getElementById("license-lock-overlay").classList.remove("hidden");
+      }
     }
-}
 
-async function verifyLicenseNow(isManualClick = false) {
-    const devId = getOrCreateDeviceId();
-    const lockOverlay = document.getElementById("license-lock-overlay");
-    const lockDeviceEl = document.getElementById("lock-device-id");
-    const lockMsgEl = document.getElementById("lock-status-msg");
-    const pillEl = document.getElementById("license-status-pill");
-    const pillTextEl = document.getElementById("license-pill-text");
-    const btnTrial = document.getElementById("btn-start-trial");
+    async function verifyLicenseNow(isManualClick = false) {
+      const devId = getOrCreateDeviceId();
+      const lockOverlay = document.getElementById("license-lock-overlay");
+      const lockDeviceEl = document.getElementById("lock-device-id");
+      const lockMsgEl = document.getElementById("lock-status-msg");
+      const pillEl = document.getElementById("license-status-pill");
+      const pillTextEl = document.getElementById("license-pill-text");
+      const btnTrial = document.getElementById("btn-start-trial");
 
-    if (lockDeviceEl) lockDeviceEl.textContent = devId;
-    if (localStorage.getItem(STORAGE_PREFIX + "trial_used") === "true" && btnTrial) {
+      if (lockDeviceEl) lockDeviceEl.textContent = devId;
+      if (localStorage.getItem(STORAGE_PREFIX + "trial_used") === "true" && btnTrial) {
         btnTrial.classList.add("hidden");
-    }
+      }
 
-    const todayStr = new Date().toISOString().slice(0, 10);
+      const todayStr = new Date().toISOString().slice(0, 10);
 
-    try {
+      try {
         const res = await fetch(LICENSE_SHEET_CSV_URL + "&t=" + Date.now());
         if (res.ok) {
-            const csvText = await res.text();
-            const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
-            let matchedRecord = null;
+          const csvText = await res.text();
+          const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+          let matchedRecord = null;
 
-            for (let i = 1; i < lines.length; i++) {
-                const cols = parseCSVRow(lines[i]);
-                if (cols.length >= 5) {
-                    const rowDevId = cols[0].toUpperCase().trim();
-                    const rowName = cols[1];
-                    const rowEmail = cols[2];
-                    const rowExpiry = normalizeDateToISO(cols[3]);
-                    const rowStatus = cols[4].toUpperCase().trim();
+          for (let i = 1; i < lines.length; i++) {
+            const cols = parseCSVRow(lines[i]);
+            if (cols.length >= 5) {
+              const rowDevId = cols[0].toUpperCase().trim();
+              const rowName = cols[1];
+              const rowEmail = cols[2];
+              const rowExpiry = normalizeDateToISO(cols[3]);
+              const rowStatus = cols[4].toUpperCase().trim();
 
-                    if (rowDevId === devId.toUpperCase()) {
-                        matchedRecord = { deviceId: rowDevId, name: rowName, email: rowEmail, expiry: rowExpiry, status: rowStatus };
-                        break;
-                    }
-                }
+              if (rowDevId === devId.toUpperCase()) {
+                matchedRecord = { deviceId: rowDevId, name: rowName, email: rowEmail, expiry: rowExpiry, status: rowStatus };
+                break;
+              }
             }
+          }
 
-            if (matchedRecord) {
-                localStorage.setItem(STORAGE_PREFIX + "license_cache", JSON.stringify(matchedRecord));
-                if (matchedRecord.status === "ACTIVE" && matchedRecord.expiry >= todayStr) {
-                    lockOverlay.classList.add("hidden");
-                    if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-                    if (pillTextEl) pillTextEl.textContent = `Licensed (${matchedRecord.expiry})`;
-                    if (isManualClick) alert(`ಅಭಿನಂದನೆಗಳು ${matchedRecord.name || ''}! ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ${matchedRecord.expiry} ರವರೆಗೆ ಸಕ್ರಿಯವಾಗಿದೆ.`);
-                    return;
-                } else {
-                    lockMsgEl.textContent = matchedRecord.expiry < todayStr
-                        ? `⚠️ ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ಅವಧಿ (${matchedRecord.expiry}) ಮುಗಿದಿದೆ. ದಯವಿಟ್ಟು ನವೀಕರಿಸಿ.`
-                        : `⚠️ ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ಸ್ಥಿತಿ: ${matchedRecord.status}. ಸತ್ಯಬೋಧರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
-                    lockOverlay.classList.remove("hidden");
-                    if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-                    if (pillTextEl) pillTextEl.textContent = "Expired / Locked";
-                    return;
-                }
+          if (matchedRecord) {
+            localStorage.setItem(STORAGE_PREFIX + "license_cache", JSON.stringify(matchedRecord));
+            if (matchedRecord.status === "ACTIVE" && matchedRecord.expiry >= todayStr) {
+              lockOverlay.classList.add("hidden");
+              if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1 shadow-sm text-xs";
+              if (pillTextEl) pillTextEl.textContent = `Licensed (${matchedRecord.expiry})`;
+              if (isManualClick) alert(`ಅಭಿನಂದನೆಗಳು ${matchedRecord.name || ''}! ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ${matchedRecord.expiry} ರವರೆಗೆ ಸಕ್ರಿಯವಾಗಿದೆ.`);
+              return;
+            } else {
+              lockMsgEl.textContent = matchedRecord.expiry < todayStr
+                ? `⚠️ ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ಅವಧಿ (${matchedRecord.expiry}) ಮುಗಿದಿದೆ. ದಯವಿಟ್ಟು ನವೀಕರಿಸಿ.`
+                : `⚠️ ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ಸ್ಥಿತಿ: ${matchedRecord.status}. ಸತ್ಯಬೋಧರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+              lockOverlay.classList.remove("hidden");
+              if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1 shadow-sm text-xs";
+              if (pillTextEl) pillTextEl.textContent = "Expired / Locked";
+              return;
             }
+          } else {
+            localStorage.removeItem(STORAGE_PREFIX + "license_cache");
+          }
         }
-    } catch (err) {
+      } catch (err) {
         const cached = JSON.parse(localStorage.getItem(STORAGE_PREFIX + "license_cache") || "null");
         if (cached && cached.deviceId === devId && cached.status === "ACTIVE" && cached.expiry >= todayStr) {
-            lockOverlay.classList.add("hidden");
-            if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-            if (pillTextEl) pillTextEl.textContent = `Licensed (${cached.expiry})`;
-            return;
+          lockOverlay.classList.add("hidden");
+          if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1 shadow-sm text-xs";
+          if (pillTextEl) pillTextEl.textContent = `Licensed (${cached.expiry})`;
+          return;
         }
-    }
+      }
 
-    // 15 ನಿಮಿಷಗಳ ಟ್ರಯಲ್ ಪರಿಶೀಲನೆ
-    const trialExp = parseInt(localStorage.getItem(STORAGE_PREFIX + "trial_expiry") || "0");
-    if (trialExp > Date.now()) {
+      // Check 15-Minute Free Trial
+      const trialExp = parseInt(localStorage.getItem(STORAGE_PREFIX + "trial_expiry") || "0");
+      if (trialExp > Date.now()) {
         const minsLeft = Math.ceil((trialExp - Date.now()) / 60000);
         lockOverlay.classList.add("hidden");
         if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-300 font-bold flex items-center gap-1 shadow-sm text-xs";
         if (pillTextEl) pillTextEl.textContent = `Trial (${minsLeft}m left)`;
         return;
-    }
+      }
 
-    document.getElementById("lic-user-name").value = localStorage.getItem(STORAGE_PREFIX + "lic_name") || "";
-    document.getElementById("lic-user-email").value = localStorage.getItem(STORAGE_PREFIX + "lic_email") || "";
-    lockOverlay.classList.remove("hidden");
-    if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-    if (pillTextEl) pillTextEl.textContent = "Activation Required";
-    if (isManualClick) {
+      document.getElementById("lic-user-name").value = localStorage.getItem(STORAGE_PREFIX + "lic_name") || "";
+      document.getElementById("lic-user-email").value = localStorage.getItem(STORAGE_PREFIX + "lic_email") || "";
+      lockOverlay.classList.remove("hidden");
+      if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1 shadow-sm text-xs";
+      if (pillTextEl) pillTextEl.textContent = "Activation Required";
+      if (isManualClick) {
         alert("ಇನ್ನೂ ನಿಮ್ಮ Device ID (" + devId + ") ಆಕ್ಟಿವೇಟ್ ಆಗಿಲ್ಲ. ದಯವಿಟ್ಟು WhatsApp ಮೂಲಕ ಸತ್ಯಬೋಧರಿಗೆ ಕಳುಹಿಸಿ.");
+      }
     }
-}
 
-window.addEventListener("DOMContentLoaded", () => {
-    verifyLicenseNow(false);
-    if ('serviceWorker' in navigator) {
+    window.addEventListener("DOMContentLoaded", () => {
+      verifyLicenseNow(false);
+      // ಪ್ರತಿ 15 ಸೆಕೆಂಡ್‌ಗೆ ಒಮ್ಮೆ ಲೈವ್ ಪರಿಶೀಲನೆ (ಟ್ರಯಲ್ ಮುಗಿದರೆ ಅಥವಾ INACTIVE ಮಾಡಿದರೆ ತಕ್ಷಣ ಲಾಕ್ ಆಗಲು)
+      setInterval(() => {
+        verifyLicenseNow(false);
+      }, 15000);
+
+      if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed', err));
-    }
-});
-</script>
-
+      }
+    });
+  </script>
 </body>
 </html>
