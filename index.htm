@@ -2329,7 +2329,7 @@
       return devId;
     }
 
-    // CSV ರೋ ಅನ್ನು ಸರಿಯಾಗಿ ಸ್ಪ್ಲಿಟ್ ಮಾಡಲು ರೋಬಸ್ಟ್ ಪಾರ್ಸರ್ (ತಾರಬಲ ಆಪ್‌ನಂತೆ)
+    // CSV ರೋ ಅನ್ನು ಅತ್ಯಂತ ನಿಖರವಾಗಿ ಪಾರ್ಸ್ ಮಾಡುವ ಫಂಕ್ಷನ್
     function parseCSVRow(rowStr) {
       const result = [];
       let cur = "";
@@ -2351,12 +2351,14 @@
 
     async function checkLicenseStatus() {
       const devId = getDeviceID();
-      const isActivatedLocal = localStorage.getItem('vedaIsActivated') === 'true';
+      const expEl = document.getElementById('expiryDateDisplay');
+      const modal = document.getElementById('licenseModal');
 
       try {
+        // ಬ್ರೌಸರ್ ಕ್ಯಾಶ್ ತಪ್ಪಿಸಲು ಪ್ರತಿ ಬಾರಿ ಲೈವ್ ಟೈಮ್‌ಸ್ಟಾಂಪ್ ಜೊತೆ ಫೆಚ್ ಮಾಡುವುದು
         const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
-        if (!response.ok) return isActivatedLocal;
-        
+        if (!response.ok) return false;
+
         const csvText = await response.text();
         const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
         let matchedRecord = null;
@@ -2378,33 +2380,108 @@
           }
         }
 
-        const expEl = document.getElementById('expiryDateDisplay');
-
         if (matchedRecord) {
           if (matchedRecord.status === 'ACTIVE') {
             localStorage.setItem('vedaIsActivated', 'true');
             localStorage.setItem('vedaExpiryDate', matchedRecord.expiry);
             if (expEl) expEl.textContent = matchedRecord.expiry;
+            if (modal) modal.classList.add('hidden');
             return true;
           } else {
             // ಶೀಟ್‌ನಲ್ಲಿ INACTIVE ಮಾಡಿದ್ದರೆ ತಕ್ಷಣ ಲೈಸೆನ್ಸ್ ರದ್ದುಗೊಳಿಸಿ ಲಾಕ್ ಮಾಡುವುದು
             localStorage.removeItem('vedaIsActivated');
             localStorage.removeItem('vedaExpiryDate');
             if (expEl) expEl.textContent = 'Inactive / Locked';
+            if (modal) modal.classList.remove('hidden');
             return false;
           }
         } else {
-          return isActivatedLocal;
+          // ಶೀಟ್‌ನಲ್ಲಿ ಈ ಡಿವೈಸ್ ಐಡಿ ಇಲ್ಲದಿದ್ದರೆ ಲಾಕ್ ಮಾಡುವುದು
+          localStorage.removeItem('vedaIsActivated');
+          localStorage.removeItem('vedaExpiryDate');
+          if (modal) modal.classList.remove('hidden');
+          return false;
         }
       } catch (err) {
-        // ನೆಟ್‌ವರ್ಕ್ ಸಮಸ್ಯೆ ಇದ್ದರೆ ಲೋಕಲ್ ಕ್ಯಾಶ್ ಬಳಸುವುದು
+        // ನೆಟ್‌ವರ್ಕ್ ಸಮಸ್ಯೆ ಇದ್ದಾಗ ಲೋಕಲ್ ಮೆಮೊರಿ ಪರಿಶೀಲಿಸುವುದು
+        const savedActivated = localStorage.getItem('vedaIsActivated') === 'true';
         const savedExpiry = localStorage.getItem('vedaExpiryDate');
-        const expEl = document.getElementById('expiryDateDisplay');
-        if (expEl && savedExpiry) expEl.textContent = savedExpiry;
-        return isActivatedLocal;
+        if (savedActivated && savedExpiry) {
+          if (expEl) expEl.textContent = savedExpiry;
+          if (modal) modal.classList.add('hidden');
+          return true;
+        }
+        return false;
       }
     }
 
+    async function initLicenseSystem() {
+      const devId = getDeviceID();
+      const devInput = document.getElementById('licenseDeviceInput');
+      if (devInput) devInput.value = devId;
+
+      await checkLicenseStatus();
+
+      // ಪ್ರತಿ 10 ಸೆಕೆಂಡ್‌ಗೆ ಒಮ್ಮೆ ಶೀಟ್‌ನಲ್ಲಿ ಇನ್‌ಆಕ್ಟಿವ್ ಮಾಡಿದ್ದಾರಾ ಎಂದು ಲೈವ್ ಚೆಕ್ ಮಾಡುವುದು
+      setInterval(async () => {
+        await checkLicenseStatus();
+      }, 10000);
+    }
+
+    async function verifyAndActivateLicenseFromSheet() {
+      const devIdInput = document.getElementById('licenseDeviceInput');
+      const devId = devIdInput ? devIdInput.value.trim().toUpperCase() : getDeviceID();
+
+      if (!devId) {
+        alert("ಡಿವೈಸ್ ಐಡಿ ಲಭ್ಯವಿಲ್ಲ.");
+        return;
+      }
+
+      try {
+        showToast("ಗೂಗಲ್ ಶೀಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
+        const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
+        const csvText = await response.text();
+        const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+        
+        let matchedRecord = null;
+
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCSVRow(lines[i]);
+          if (cols.length >= 5) {
+            const rowDevId = cols[0].toUpperCase().trim();
+            const rowExpiry = cols[3].trim();
+            const rowStatus = cols[4].toUpperCase().trim();
+
+            if (rowDevId === devId) {
+              matchedRecord = {
+                expiry: rowExpiry,
+                status: rowStatus
+              };
+              break;
+            }
+          }
+        }
+
+        if (matchedRecord && matchedRecord.status === 'ACTIVE') {
+          localStorage.setItem('vedaIsActivated', 'true');
+          localStorage.setItem('vedaExpiryDate', matchedRecord.expiry);
+          
+          const expEl = document.getElementById('expiryDateDisplay');
+          if (expEl) expEl.textContent = matchedRecord.expiry;
+
+          const modal = document.getElementById('licenseModal');
+          if (modal) modal.classList.add('hidden');
+
+          showToast("ಲೈಸೆನ್ಸ್ ಗೂಗಲ್ ಶೀಟ್ ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಆಕ್ಟಿವೇಟ್ ಆಯಿತು!");
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          alert("ದೋಷ: ಈ ಡಿವೈಸ್ ಐಡಿ ಗೂಗಲ್ ಶೀಟ್‌ನಲ್ಲಿ 'ACTIVE' ಸ್ಥಿತಿಯಲ್ಲಿಲ್ಲ ಅಥವಾ ನೋಂದಾಯಿಸಿಲ್ಲ.");
+        }
+      } catch (err) {
+        console.error("Sheet Fetch Error:", err);
+        alert("ಗೂಗಲ್ ಶೀಟ್ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ.");
+      }
+    }
     async function initLicenseSystem() {
       const devId = getDeviceID();
       const devInput = document.getElementById('licenseDeviceInput');
