@@ -2320,100 +2320,113 @@
     const TRIAL_DURATION_MS = 15 * 60 * 1000; // 15 minutes
     const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WnXKgb6vUtHZLBVa3Zrg5PinKRQrbRwkjvAkIhfCoN8/export?format=csv';
 
-    function getDeviceID() {
-      let devId = localStorage.getItem('vedaDeviceID');
-      if (!devId) {
-        devId = 'DEV-' + Math.random().toString(36).substring(2, 9).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
-        localStorage.setItem('vedaDeviceID', devId);
-      }
-      return devId;
+    function getOrCreateDeviceId() {
+    let devId = localStorage.getItem("veda_device_id");
+    if (!devId) {
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        let rand = "";
+        for (let i = 0; i < 5; i++) {
+            rand += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        devId = "VA-" + rand;
+        localStorage.setItem("veda_device_id", devId);
     }
+    return devId;
+}
 
-    // CSV ರೋ ಅನ್ನು ಅತ್ಯಂತ ನಿಖರವಾಗಿ ಪಾರ್ಸ್ ಮಾಡುವ ಫಂಕ್ಷನ್
-    function parseCSVRow(rowStr) {
-      const result = [];
-      let cur = "";
-      let inQuotes = false;
-      for (let i = 0; i < rowStr.length; i++) {
+function parseCSVRow(rowStr) {
+    const result = [];
+    let cur = "";
+    let inQuotes = false;
+    for (let i = 0; i < rowStr.length; i++) {
         const ch = rowStr[i];
         if (ch === '"') {
-          inQuotes = !inQuotes;
+            inQuotes = !inQuotes;
         } else if (ch === ',' && !inQuotes) {
-          result.push(cur.trim());
-          cur = "";
+            result.push(cur.trim());
+            cur = "";
         } else {
-          cur += ch;
+            cur += ch;
         }
-      }
-      result.push(cur.trim());
-      return result;
     }
+    result.push(cur.trim());
+    return result;
+}
 
-    async function checkLicenseStatus() {
-      const devId = getDeviceID();
-      const expEl = document.getElementById('expiryDateDisplay');
-      const modal = document.getElementById('licenseModal');
+async function checkLicenseStatus() {
+    const devId = getOrCreateDeviceId();
+    const expEl = document.getElementById('expiryDateDisplay');
+    const modal = document.getElementById('licenseModal');
 
-      try {
-        // ಬ್ರೌಸರ್ ಕ್ಯಾಶ್ ತಪ್ಪಿಸಲು ಪ್ರತಿ ಬಾರಿ ಲೈವ್ ಟೈಮ್‌ಸ್ಟಾಂಪ್ ಜೊತೆ ಫೆಚ್ ಮಾಡುವುದು
-        const response = await fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now());
-        if (!response.ok) return false;
+    try {
+        const res = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + Date.now());
+        if (!res.ok) return false;
 
-        const csvText = await response.text();
+        const csvText = await res.text();
         const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
         let matchedRecord = null;
 
         for (let i = 1; i < lines.length; i++) {
-          const cols = parseCSVRow(lines[i]);
-          if (cols.length >= 5) {
-            const rowDevId = cols[0].toUpperCase().trim(); // Column A: DeviceID
-            const rowExpiry = cols[3].trim();             // Column D: ExpiryDate (2030-12-31)
-            const rowStatus = cols[4].toUpperCase().trim(); // Column E: Status (ACTIVE / INACTIVE)
+            const cols = parseCSVRow(lines[i]);
+            if (cols.length >= 5) {
+                const rowDevId = cols[0].toUpperCase().trim();
+                const rowExpiry = cols[3].trim();
+                const rowStatus = cols[4].toUpperCase().trim();
 
-            if (rowDevId === devId.toUpperCase().trim()) {
-              matchedRecord = {
-                expiry: rowExpiry,
-                status: rowStatus
-              };
-              break;
+                if (rowDevId === devId.toUpperCase()) {
+                    matchedRecord = {
+                        expiry: rowExpiry,
+                        status: rowStatus
+                    };
+                    break;
+                }
             }
-          }
         }
 
         if (matchedRecord) {
-          if (matchedRecord.status === 'ACTIVE') {
-            localStorage.setItem('vedaIsActivated', 'true');
-            localStorage.setItem('vedaExpiryDate', matchedRecord.expiry);
-            if (expEl) expEl.textContent = matchedRecord.expiry;
-            if (modal) modal.classList.add('hidden');
-            return true;
-          } else {
-            // ಶೀಟ್‌ನಲ್ಲಿ INACTIVE ಮಾಡಿದ್ದರೆ ತಕ್ಷಣ ಲೈಸೆನ್ಸ್ ರದ್ದುಗೊಳಿಸಿ ಲಾಕ್ ಮಾಡುವುದು
-            localStorage.removeItem('vedaIsActivated');
-            localStorage.removeItem('vedaExpiryDate');
-            if (expEl) expEl.textContent = 'Inactive / Locked';
-            if (modal) modal.classList.remove('hidden');
-            return false;
-          }
+            if (matchedRecord.status === "ACTIVE") {
+                localStorage.setItem("vedaIsActivated", "true");
+                localStorage.setItem("vedaExpiryDate", matchedRecord.expiry);
+                if (expEl) expEl.textContent = matchedRecord.expiry;
+                if (modal) modal.classList.add("hidden");
+                return true;
+            } else {
+                localStorage.removeItem("vedaIsActivated");
+                localStorage.removeItem("vedaExpiryDate");
+                if (expEl) expEl.textContent = "Inactive / Locked";
+                if (modal) modal.classList.remove("hidden");
+                return false;
+            }
         } else {
-          // ಶೀಟ್‌ನಲ್ಲಿ ಈ ಡಿವೈಸ್ ಐಡಿ ಇಲ್ಲದಿದ್ದರೆ ಲಾಕ್ ಮಾಡುವುದು
-          localStorage.removeItem('vedaIsActivated');
-          localStorage.removeItem('vedaExpiryDate');
-          if (modal) modal.classList.remove('hidden');
-          return false;
+            localStorage.removeItem("vedaIsActivated");
+            localStorage.removeItem("vedaExpiryDate");
+            if (modal) modal.classList.remove("hidden");
+            return false;
         }
-      } catch (err) {
-        // ನೆಟ್‌ವರ್ಕ್ ಸಮಸ್ಯೆ ಇದ್ದಾಗ ಲೋಕಲ್ ಮೆಮೊರಿ ಪರಿಶೀಲಿಸುವುದು
-        const savedActivated = localStorage.getItem('vedaIsActivated') === 'true';
-        const savedExpiry = localStorage.getItem('vedaExpiryDate');
-        if (savedActivated && savedExpiry) {
-          if (expEl) expEl.textContent = savedExpiry;
-          if (modal) modal.classList.add('hidden');
-          return true;
+    } catch (err) {
+        const isLocalActive = localStorage.getItem("vedaIsActivated") === "true";
+        const savedExpiry = localStorage.getItem("vedaExpiryDate");
+        if (isLocalActive && savedExpiry) {
+            if (expEl) expEl.textContent = savedExpiry;
+            if (modal) modal.classList.add("hidden");
+            return true;
         }
+        if (modal) modal.classList.remove("hidden");
         return false;
-      }
     }
+}
+
+async function initLicenseSystem() {
+    const devId = getOrCreateDeviceId();
+    const devInput = document.getElementById('licenseDeviceInput');
+    if (devInput) devInput.value = devId;
+
+    await checkLicenseStatus();
+
+    setInterval(async () => {
+        await checkLicenseStatus();
+    }, 15000);
+}
 
     async function initLicenseSystem() {
       const devId = getDeviceID();
