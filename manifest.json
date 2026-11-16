@@ -6,11 +6,13 @@
   "display": "standalone",
   "background_color": "#f6faf7",
   "theme_color": "#1f5038",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%231f5038'/><circle cx='256' cy='256' r='200' fill='none' stroke='%23d97706' stroke-width='16'/><text x='256' y='320' font-size='220' text-anchor='middle' fill='%23d97706' font-family='serif'>ॐ</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
