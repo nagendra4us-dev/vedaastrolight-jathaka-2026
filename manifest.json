@@ -1,17 +1,23 @@
 {
-  "name": "Veda Astrolight - ಜಾತಕ ಗಣಕ",
-  "short_name": "VedaAstrolight",
-  "description": "ಗ್ರಹ ಸಮಯ ಹಾಗೂ ಜಾತಕ ಗಣಕ ವ್ಯವಸ್ಥೆ",
+  "id": "/",
+  "name": "ವೇದ ಆಸ್ಟ್ರೋಲೈಟ್ - ಕ್ಲೈಂಟ್ ವಾಲ್ಟ್",
+  "short_name": "ಕ್ಲೈಂಟ್ ವಾಲ್ಟ್",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f6faf7",
-  "theme_color": "#1f5038",
-  "orientation": "portrait-primary",
+  "background_color": "#fffdf9",
+  "theme_color": "#bf360c",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%231f5038'/><circle cx='256' cy='256' r='200' fill='none' stroke='%23d97706' stroke-width='16'/><text x='256' y='320' font-size='220' text-anchor='middle' fill='%23d97706' font-family='serif'>ॐ</text></svg>",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
