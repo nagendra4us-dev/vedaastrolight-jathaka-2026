@@ -92,59 +92,28 @@
 </head>
 <body class="min-h-full flex flex-col antialiased selection:bg-emerald-200 selection:text-emerald-950">
 
-  <!-- ==================== LICENSE & ACTIVATION LOCK GATE ==================== -->
-    <div id="license-lock-overlay" class="hidden fixed inset-0 z-[100] bg-emerald-950/85 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-[#fffdf7] border-2 border-emerald-300 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden p-6 space-y-5">
-            <div class="text-center space-y-1 border-b border-emerald-100 pb-4">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-orange-100 text-orange-700 text-2xl mb-1 shadow-sm">🔐</div>
-                <h2 class="text-xl font-extrabold text-orange-700">Veda Astrolight</h2>
-                <p class="text-xs font-bold text-blue-700">Satyabodha Nagendra • Licensed Edition</p>
-                <p id="lock-status-msg" class="text-xs text-rose-700 font-bold pt-1">ಈ ಆ್ಯಪ್ ಬಳಸಲು ಸಕ್ರಿಯ ಲೈಸೆನ್ಸ್ (Active Subscription) ಅಗತ್ಯವಿದೆ.</p>
-            </div>
+  <!-- ==================== SIMPLE DEV PASSWORD LOCK GATE (1008) ==================== -->
+  <div id="dev-password-lock" class="fixed inset-0 z-[100] bg-emerald-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#fffdf7] border-2 border-emerald-300 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden p-6 space-y-4 text-center">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 text-2xl shadow-sm mx-auto">
+        🔒
+      </div>
+      <div>
+        <h2 class="text-lg font-extrabold text-emerald-950">VEDA ASTROLIGHT</h2>
+        <p class="text-xs text-emerald-700 font-semibold mt-0.5">ಮುಂದುವರಿಯಲು ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ</p>
+      </div>
 
-            <!-- Unique Device ID Box -->
-            <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-bold text-emerald-800 uppercase block">ನಿಮ್ಮ ಡಿವೈಸ್ ಐಡಿ (Device ID):</span>
-                    <strong id="lock-device-id" class="font-mono text-base text-emerald-950 tracking-wider">VA-0000</strong>
-                </div>
-                <button onclick="copyDeviceId()" class="px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 text-xs font-bold hover:bg-emerald-100 transition shadow-sm">
-                    📋 ಕಾಪಿ ಮಾಡಿ
-                </button>
-            </div>
+      <div class="space-y-2 text-left">
+        <input type="password" id="devPassInput" placeholder="ಪಾಸ್‌ವರ್ಡ್ (Password)" onkeydown="if(event.key==='Enter') unlockWithDevPass();" class="w-full bg-white border border-emerald-300 rounded-xl px-3.5 py-2.5 text-center font-mono text-base tracking-widest text-emerald-950 focus:border-emerald-700 focus:outline-none">
+        <p id="devPassError" class="text-[11px] text-rose-700 font-bold text-center hidden">ತಪ್ಪಾದ ಪಾಸ್‌ವರ್ಡ್! ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</p>
+      </div>
 
-            <!-- Client Details Form -->
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">ನಿಮ್ಮ ಹೆಸರು (Full Name):</label>
-                    <input type="text" id="lic-user-name" placeholder="ಉದಾ: ರಮೇಶ್ ಕುಮಾರ್" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">ನಿಮ್ಮ ಇಮೇಲ್ (Email Address):</label>
-                    <input type="email" id="lic-user-email" placeholder="example@gmail.com" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none">
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="space-y-2.5 pt-1">
-                <button onclick="requestActivationWhatsApp()" class="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm transition shadow-md flex items-center justify-center gap-2">
-                    <span>📲</span> WhatsApp ಮೂಲಕ ಆಕ್ಟಿವೇಶನ್ ಕೇಳಿ
-                </button>
-
-                <button onclick="verifyLicenseNow(true)" id="btn-verify-license" class="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs transition shadow-sm flex items-center justify-center gap-2">
-                    <span>🔄</span> ಆಕ್ಟಿವೇಟ್ ಆಗಿದೆಯೇ ಪರಿಶೀಲಿಸಿ (Verify License)
-                </button>
-
-                <button id="btn-start-trial" onclick="activateFreeTrial()" class="w-full py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 font-bold text-xs transition">
-                    ✨ ಮೊದಲ 15 ನಿಮಿಷ ಉಚಿತವಾಗಿ ಬಳಸಿ (Start 15-Min Trial)
-                </button>
-            </div>
-
-            <div class="text-center text-[11px] text-slate-500 border-t border-emerald-100 pt-3">
-                ಸಹಾಯಕ್ಕಾಗಿ ಸಂಪರ್ಕಿಸಿ: <strong class="font-mono text-blue-900">7349577177</strong> • ಸತ್ಯಬೋಧ ನಾಗೇಂದ್ರ
-            </div>
-        </div>
+      <button type="button" onclick="unlockWithDevPass()" class="w-full py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white font-bold text-sm transition shadow-md cursor-pointer">
+        ಅನ್ಲಾಕ್ ಮಾಡಿ (Unlock)
+      </button>
     </div>
+  </div>
+
   <!-- TOP APP HEADER -->
   <header class="bg-white border-b border-emerald-100 shadow-sm no-print sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
@@ -165,11 +134,6 @@
             </a>
             <span class="text-emerald-300">•</span>
             <span class="font-semibold text-emerald-900">Astrologer: Satyabodha Nagendra</span>
-<span class="text-emerald-300">•</span>
-<!-- ಲೈಸೆನ್ಸ್ ಸ್ಟೇಟಸ್ ಬಟನ್ -->
-    <button onclick="showLicenseInfoModal()" id="license-status-pill" class="px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-300 font-bold flex items-center gap-1 shadow-sm text-xs">
-        <span>🔑</span> <span id="license-pill-text">ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...</span>
-    </button>
           </div>
         </div>
       </div>
@@ -206,7 +170,7 @@
         </button>
         <button onclick="switchTab('tabBala')" id="btn-tabBala" class="tab-btn inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white text-emerald-950 border border-emerald-300 hover:border-emerald-500 hover:bg-emerald-50 shadow-xs hover:shadow transition-all transform active:scale-95 cursor-pointer">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-          <span>ಗ್ರಹಬಲ</span>
+          <span>ಗ್ರಹಬಲ (ಷಡ್ಬಲ & ಭಾವಬಲ)</span>
         </button>
         <button onclick="switchTab('tabDiet')" id="btn-tabDiet" class="tab-btn inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white text-emerald-950 border border-emerald-300 hover:border-emerald-500 hover:bg-emerald-50 shadow-xs hover:shadow transition-all transform active:scale-95 cursor-pointer">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
@@ -446,26 +410,31 @@
       </div>
     </div>
 
-    <!-- TAB 4: ಗ್ರಹಬಲ -->
+    <!-- TAB 4: ಗ್ರಹಬಲ (480-Virupa System Shadbala, Sripati Bhava Bala & Vimshopaka Bala) -->
     <div id="tabBala" class="tab-content hidden space-y-4">
+
+      <!-- Vedic Sunrise/Sunset & Sripati Cusps Info Strip -->
+      <section id="vedicTimingStrip" class="bg-white p-3.5 rounded-2xl border border-emerald-100 shadow-xs grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs"></section>
+
+      <!-- 1. Main 480-Virupa Shadbala Table -->
       <section class="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-100 shadow-xs space-y-4">
         <div class="flex flex-wrap items-center justify-between border-b border-emerald-100 pb-3 gap-2">
           <div>
             <h3 class="text-sm sm:text-base font-bold text-emerald-950 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-700"></span>
-              ಷಡ್ಬಲ ವಿವರ ಹಾಗೂ ಇಷ್ಟ-ಕಷ್ಟ ಫಲ ಗಣಿತ (Shadbala & Ishta-Kashta Phala)
+              480-ವಿರೂಪ ಸಿಸ್ಟಮ್ ಷಡ್ಬಲ ಹಾಗೂ ಇಷ್ಟ-ಕಷ್ಟ ಫಲ (B.V. Raman / Deepak Kapoor System)
             </h3>
-            <p class="text-xs text-emerald-700 mt-0.5">ಪ್ರತಿಯೊಂದು ಗ್ರಹದ ಸ್ಥಾನ, ದಿಕ್, ಕಾಲ, ಚೇಷ್ಟಾ, ನೈಸರ್ಗಿಕ, ದೃಗ್ಬಲ ಹಾಗೂ ನಿಖರ ಇಷ್ಟ-ಕಷ್ಟ ಫಲಗಳು</p>
+            <p class="text-xs text-emerald-700 mt-0.5">ವೈದಿಕ ಸೂರ್ಯೋದಯ/ಸೂರ್ಯಾಸ್ತ, ಶ್ರೀಪತಿ ಭಾವ ಮಧ್ಯ, ಪಂಚಧಾ ಮೈತ್ರಿ ಸಪ್ತವರ್ಗಜ ಹಾಗೂ ಕ್ರಾಂತಿ ಆಧಾರಿತ ನಿಖರ ಷಡ್ಬಲ (60 ವಿರೂಪ = 1 ರೂಪ)</p>
           </div>
-          <span class="text-[11px] font-medium bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg text-emerald-900">
-            ಷಡ್ಬಲ ಮಾನದಂಡ: ೬೦ ಷಷ್ಟ್ಯಾಂಶ = ೧ ರೂಪ
+          <span class="text-[11px] font-semibold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg text-emerald-900">
+            8 Rupas (480 Virupa) Standard
           </span>
         </div>
 
         <div class="mobile-scroll-x custom-scrollbar">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-emerald-50/80 text-gray-900 border-b border-emerald-200 text-[11px] font-bold">
+              <tr class="bg-emerald-900 text-white text-[11px] font-bold">
                 <th class="py-2.5 px-3">ಗ್ರಹ</th>
                 <th class="py-2.5 px-2 text-center font-mono">ಸ್ಥಾನಬಲ</th>
                 <th class="py-2.5 px-2 text-center font-mono">ದಿಗ್ಬಲ</th>
@@ -473,11 +442,13 @@
                 <th class="py-2.5 px-2 text-center font-mono">ಚೇಷ್ಟಾಬಲ</th>
                 <th class="py-2.5 px-2 text-center font-mono">ನೈಸರ್ಗಿಕ</th>
                 <th class="py-2.5 px-2 text-center font-mono">ದೃಗ್ಬಲ</th>
-                <th class="py-2.5 px-3 font-mono text-center font-bold text-gray-950">ಒಟ್ಟು ಷಡ್ಬಲ (ವಿರೂಪ)</th>
-                <th class="py-2.5 px-3 font-mono text-center font-bold text-gray-950">ಒಟ್ಟು ರೂಪ (Rupas)</th>
-                <th class="py-2.5 px-2 font-mono text-center">ಅಗತ್ಯ ಕನಿಷ್ಠ</th>
-                <th class="py-2.5 px-3 font-mono font-bold text-center text-emerald-800">ಇಷ್ಟ ಫಲ (Ishta)</th>
-                <th class="py-2.5 px-3 font-mono font-bold text-center text-rose-800">ಕಷ್ಟ ಫಲ (Kashta)</th>
+                <th class="py-2.5 px-3 font-mono text-center font-bold bg-emerald-950">ಒಟ್ಟು ವಿರೂಪ</th>
+                <th class="py-2.5 px-3 font-mono text-center font-bold bg-emerald-950">ಒಟ್ಟು ರೂಪ</th>
+                <th class="py-2.5 px-2 font-mono text-center">ಕನಿಷ್ಠ ರೂಪ</th>
+                <th class="py-2.5 px-2 font-mono text-center">ಅನುಪಾತ (Ratio)</th>
+                <th class="py-2.5 px-2 text-center">ಶ್ರೇಣಿ (Rank)</th>
+                <th class="py-2.5 px-2 font-mono text-center text-emerald-200">ಇಷ್ಟ ಫಲ</th>
+                <th class="py-2.5 px-2 font-mono text-center text-rose-200">ಕಷ್ಟ ಫಲ</th>
                 <th class="py-2.5 px-3 text-center">ಬಲ ಸ್ಥಿತಿ</th>
               </tr>
             </thead>
@@ -486,6 +457,100 @@
         </div>
       </section>
 
+      <!-- 2. Detailed Sub-components Breakdown (Sthana & Kaala Bala) -->
+      <section class="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-100 shadow-xs space-y-4">
+        <div class="flex flex-wrap items-center justify-between border-b border-emerald-100 pb-3 gap-2">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-emerald-950 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-teal-700"></span>
+              ಸ್ಥಾನಬಲ ಮತ್ತು ಕಾಲಬಲ ಉಪ-ವಿಭಾಗಗಳ ವಿವರ (Sub-Components Breakdown)
+            </h3>
+            <p class="text-xs text-emerald-700 mt-0.5">ಉಚ್ಚ, ಸಪ್ತವರ್ಗಜ, ಓಜಯುಗ್ಮ, ಕೇಂದ್ರಾದಿ, ದ್ರೇಕ್ಕಾಣ ಹಾಗೂ ನತೋನ್ನತ, ಪಕ್ಷ, ತ್ರಿಭಾಗ, ಅಬ್ದ-ಮಾಸ-ವಾರ-ಹೋರಾ, ಅಯನ, ಯುದ್ಧ ಬಲಗಳು</p>
+          </div>
+        </div>
+
+        <div class="mobile-scroll-x custom-scrollbar">
+          <table class="w-full text-left border-collapse text-[11px]">
+            <thead>
+              <tr class="bg-emerald-50 text-emerald-950 border-b border-emerald-200 font-bold">
+                <th class="py-2 px-2.5">ಗ್ರಹ</th>
+                <th class="py-2 px-2 text-center font-mono">ಉಚ್ಚ</th>
+                <th class="py-2 px-2 text-center font-mono">ಸಪ್ತವರ್ಗಜ</th>
+                <th class="py-2 px-2 text-center font-mono">ಓಜಯುಗ್ಮ</th>
+                <th class="py-2 px-2 text-center font-mono">ಕೇಂದ್ರಾದಿ</th>
+                <th class="py-2 px-2 text-center font-mono">ದ್ರೇಕ್ಕಾಣ</th>
+                <th class="py-2 px-2 text-center font-mono bg-emerald-100/70">ನತೋನ್ನತ</th>
+                <th class="py-2 px-2 text-center font-mono bg-emerald-100/70">ಪಕ್ಷಬಲ</th>
+                <th class="py-2 px-2 text-center font-mono bg-emerald-100/70">ತ್ರಿಭಾಗ</th>
+                <th class="py-2 px-2 text-center font-mono bg-emerald-100/70">ಅ-ಮಾ-ವಾ-ಹೋ</th>
+                <th class="py-2 px-2 text-center font-mono bg-emerald-100/70">ಅಯನ</th>
+                <th class="py-2 px-2 text-center font-mono bg-emerald-100/70">ಯುದ್ಧ</th>
+              </tr>
+            </thead>
+            <tbody id="shadbalaSubTableBody" class="divide-y divide-emerald-50 text-gray-800 font-mono"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. Sripati Bhava Bala (12 Houses) & Vimshopaka Bala (20-Point Scale) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Sripati Bhava Bala -->
+        <section class="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-100 shadow-xs space-y-3">
+          <div class="border-b border-emerald-100 pb-2.5">
+            <h3 class="text-sm sm:text-base font-bold text-emerald-950 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
+              ಶ್ರೀಪತಿ ಭಾವಬಲ (Sripati Bhava Bala - 12 Bhavas)
+            </h3>
+            <p class="text-[11px] text-emerald-700 mt-0.5">ಭಾವಾಧಿಪತಿ ಬಲ + ಭಾವ ದಿಗ್ಬಲ + ಭಾವ ದೃಗ್ಬಲ (ಭಾವ ದೃಷ್ಟಿಯಲ್ಲಿ ಬುಧ ಸದಾ ಶುಭ)</p>
+          </div>
+          <div class="mobile-scroll-x custom-scrollbar">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-emerald-900 text-white text-[11px]">
+                  <th class="py-2 px-2.5">ಭಾವ</th>
+                  <th class="py-2 px-2 font-mono">ಭಾವ ಮಧ್ಯ</th>
+                  <th class="py-2 px-2">ಅಧಿಪತಿ</th>
+                  <th class="py-2 px-2 text-center font-mono">ಅಧಿಪತಿ ಬಲ</th>
+                  <th class="py-2 px-2 text-center font-mono">ದಿಗ್ಬಲ</th>
+                  <th class="py-2 px-2 text-center font-mono">ದೃಗ್ಬಲ</th>
+                  <th class="py-2 px-2.5 text-center font-mono font-bold">ಒಟ್ಟು ವಿರೂಪ (ರೂಪ)</th>
+                </tr>
+              </thead>
+              <tbody id="bhavaBalaTableBody" class="divide-y divide-emerald-50 text-gray-900"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Vimshopaka Bala (20-Point Scale) -->
+        <section class="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-100 shadow-xs space-y-3">
+          <div class="border-b border-emerald-100 pb-2.5">
+            <h3 class="text-sm sm:text-base font-bold text-emerald-950 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-700"></span>
+              ವಿಂಶೋಪಕ ಬಲ (Vimshopaka Bala — 20 ಅಂಕಗಳ ಮಾನದಂಡ)
+            </h3>
+            <p class="text-[11px] text-emerald-700 mt-0.5">ಷಡ್ವರ್ಗ, ಸಪ್ತವರ್ಗ, ದಶವರ್ಗ ಮತ್ತು ಷೋಡಶವರ್ಗಗಳಲ್ಲಿ ಪಂಚಧಾ ಮೈತ್ರಿ ಆಧಾರಿತ 20 ಅಂಕಗಳ ಬಲ</p>
+          </div>
+          <div class="mobile-scroll-x custom-scrollbar">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-emerald-900 text-white text-[11px]">
+                  <th class="py-2 px-3">ಗ್ರಹ</th>
+                  <th class="py-2 px-2.5 text-center font-mono">ಷಡ್ವರ್ಗ (6)</th>
+                  <th class="py-2 px-2.5 text-center font-mono">ಸಪ್ತವರ್ಗ (7)</th>
+                  <th class="py-2 px-2.5 text-center font-mono">ದಶವರ್ಗ (10)</th>
+                  <th class="py-2 px-2.5 text-center font-mono font-bold bg-emerald-950">ಷೋಡಶವರ್ಗ (16)</th>
+                </tr>
+              </thead>
+              <tbody id="vimshopakaTableBody" class="divide-y divide-emerald-50 text-gray-900 font-medium"></tbody>
+            </table>
+          </div>
+          <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-[11px] text-emerald-900">
+            <strong>ಗಮನಿಸಿ:</strong> 15+ ಅಂಕ = ಅತ್ಯುತ್ತಮ (ಪೂರ್ಣ ಫಲ), 10–15 ಅಂಕ = ಮಧ್ಯಮ (ಶುಭ ಫಲ), 10 ಕ್ಕಿಂತ ಕಡಿಮೆ = ದುರ್ಬಲ.
+          </div>
+        </section>
+      </div>
+
+      <!-- 4. Functional Lordship Section -->
       <section class="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-100 shadow-xs space-y-4">
         <div class="flex flex-wrap items-center justify-between border-b border-emerald-100 pb-3 gap-2">
           <div>
@@ -538,23 +603,37 @@
       </section>
     </div>
 
-    <!-- TAB 7: ರಿಪೋರ್ಟ್ -->
+    <!-- TAB 7: ರಿಪೋರ್ಟ್ (Plain Text Copy-Paste Format + Summary Table) -->
     <div id="tabClientReport" class="tab-content hidden space-y-4">
-      <section class="bg-white p-4 sm:p-7 rounded-2xl border border-emerald-200 shadow-xs space-y-5" id="printableReportArea">
+      <section class="bg-white p-4 sm:p-6 rounded-2xl border border-emerald-200 shadow-xs space-y-5" id="printableReportArea">
 
-        <div class="flex flex-wrap justify-between items-start gap-4">
+        <!-- Header & Copy Button -->
+        <div class="flex flex-wrap justify-between items-center gap-3 border-b border-emerald-100 pb-4">
           <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">ವೇದ ಆಸ್ಟ್ರೋಲೈಟ್ - ಸಮಗ್ರ ಜಾತಕ & ಗ್ರಹ ಸಮಯ ವರದಿ</h2>
-            <div class="text-xs text-gray-700 mt-1">
-              ಜ್ಯೋತಿಷಿ: <span class="font-semibold text-gray-900">ಸತ್ಯಬೋಧ ನಾಗೇಂದ್ರ (Satyabodha Nagendra)</span> | ಸಂಪರ್ಕ: <a href="tel:7349577177" class="font-mono font-semibold text-emerald-800 underline">7349577177</a>
-            </div>
+            <h2 class="text-lg sm:text-xl font-bold text-emerald-950 tracking-tight flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+              ಸಿದ್ಧ ಟೆಕ್ಸ್ಟ್ ರಿಪೋರ್ಟ್ (Ready-to-Copy Text Report)
+            </h2>
+            <p class="text-xs text-emerald-700 mt-0.5">
+              WhatsApp ಅಥವಾ ನೋಟ್‌ಪ್ಯಾಡ್‌ಗೆ ನೇರವಾಗಿ ಕಾಪಿ-ಪೇಸ್ಟ್ ಮಾಡಲು ಸಿದ್ಧವಾದ ಪಠ್ಯ ವರದಿ
+            </p>
           </div>
-          <div class="text-right text-xs text-gray-700">
-            <div>ದಿನಾಂಕ: <span id="repDateHeader" class="font-semibold text-gray-900"></span></div>
-            <div>ಅಯನಾಂಶ: <span id="repAyanamsaHeader" class="font-semibold text-gray-900 font-mono">LAHIRI</span></div>
-          </div>
+          <button type="button" onclick="copyTextReport()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white text-xs sm:text-sm font-bold transition shadow-sm cursor-pointer">
+            <span>📋</span>
+            <span>ಟೆಕ್ಸ್ಟ್ ಕಾಪಿ ಮಾಡಿ (Copy Text Report)</span>
+          </button>
         </div>
 
+        <!-- Ready-to-Copy Plain Text Report Box -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-semibold text-emerald-800 px-1">
+            <span>ಪಠ್ಯ ವರದಿ ಪೂರ್ವವೀಕ್ಷಣೆ (Plain Text Preview):</span>
+            <span class="text-emerald-600">WhatsApp / Notepad ಗೆ ನೇರವಾಗಿ ಪೇಸ್ಟ್ ಮಾಡಬಹುದು</span>
+          </div>
+          <textarea id="plainTextReportBox" rows="20" class="w-full p-4 rounded-2xl bg-[#fbfefc] border-2 border-emerald-200 focus:border-emerald-600 focus:outline-none text-xs sm:text-sm font-mono text-gray-900 leading-relaxed custom-scrollbar shadow-inner" readonly></textarea>
+        </div>
+
+        <!-- Quick Reference Summary Card -->
         <div class="p-3.5 rounded-2xl bg-emerald-50/40 border border-emerald-200/80 text-xs text-gray-800 space-y-2">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             <div>
@@ -577,6 +656,10 @@
             <div>
               <span class="text-gray-600">ಜನ್ಮ ನಕ್ಷತ್ರ:</span> <strong id="repNakshatra" class="text-gray-950">—</strong>
             </div>
+          </div>
+          <div class="hidden">
+            <span id="repDateHeader"></span>
+            <span id="repAyanamsaHeader"></span>
           </div>
         </div>
 
@@ -938,27 +1021,35 @@
 
           const x_h = r * (Math.cos(nodeRad) * Math.cos(u) - Math.sin(nodeRad) * Math.sin(u) * Math.cos(incRad));
           const y_h = r * (Math.sin(nodeRad) * Math.cos(u) + Math.cos(nodeRad) * Math.sin(u) * Math.cos(incRad));
-          const z_h = r * Math.sin(u) * Math.sin(incRad);
 
           const x_e = R_earth * Math.cos(this.toRad(earthL));
           const y_e = R_earth * Math.sin(this.toRad(earthL));
 
           const X = x_h - x_e;
           const Y = y_h - y_e;
-          return this.normDeg(this.toDeg(Math.atan2(Y, X)));
+          return {
+            geoLong: this.normDeg(this.toDeg(Math.atan2(Y, X))),
+            meanAnomaly: M,
+            trueAnomaly: nu
+          };
         };
 
-        let kujaSayana = helioToGeo(planetsData.Kuja);
-        const M_mars = this.toRad(this.normDeg(planetsData.Kuja.L - planetsData.Kuja.longPeri));
+        const kujaRes = helioToGeo(planetsData.Kuja);
+        let kujaSayana = kujaRes.geoLong;
+        const M_mars = this.toRad(kujaRes.meanAnomaly);
         const M_sun_rad = this.toRad(M_sun);
         const kujaCorr = -0.018 * Math.sin(M_mars) - 0.045 * Math.cos(M_mars) + 0.025 * Math.sin(M_sun_rad);
         kujaSayana = this.normDeg(kujaSayana + kujaCorr);
 
-        const budhaSayana = helioToGeo(planetsData.Budha);
-        const guruSayana = helioToGeo(planetsData.Guru);
-        const sukraSayana = helioToGeo(planetsData.Sukra);
-        let shaniSayana = helioToGeo(planetsData.Shani);
-        shaniSayana = this.normDeg(shaniSayana + 0.123);
+        const budhaRes = helioToGeo(planetsData.Budha);
+        const guruRes = helioToGeo(planetsData.Guru);
+        const sukraRes = helioToGeo(planetsData.Sukra);
+        const shaniRes = helioToGeo(planetsData.Shani);
+
+        const budhaSayana = budhaRes.geoLong;
+        const guruSayana = guruRes.geoLong;
+        const sukraSayana = sukraRes.geoLong;
+        let shaniSayana = this.normDeg(shaniRes.geoLong + 0.123);
 
         const rahuSayana = this.normDeg(125.04452 - 1934.136261 * T + 0.0020708 * T * T);
         const ketuSayana = this.normDeg(rahuSayana + 180.0);
@@ -981,7 +1072,14 @@
         return {
           sunSayana, moonSayana, kujaSayana, budhaSayana,
           guruSayana, sukraSayana, shaniSayana, rahuSayana, ketuSayana,
-          lagnaSayana, mcSayana
+          lagnaSayana, mcSayana, eps0,
+          helioMeanLongs: {
+            Kuja: this.normDeg(planetsData.Kuja.L),
+            Budha: this.normDeg(planetsData.Budha.L),
+            Guru: this.normDeg(planetsData.Guru.L),
+            Sukra: this.normDeg(planetsData.Sukra.L),
+            Shani: this.normDeg(planetsData.Shani.L)
+          }
         };
       }
 
@@ -1003,6 +1101,38 @@
         const lagnaSayana = this.normDeg(this.toDeg(Math.atan2(ascY, ascX)));
         const ayanamsa = this.getLahiriAyanamsa(jd);
         return this.normDeg(lagnaSayana - ayanamsa);
+      }
+
+      // ವೈದಿಕ ಸೂರ್ಯೋದಯ / ಸೂರ್ಯಾಸ್ತ (Sun Center: 0.0° zenith refraction for Vedic Kaala Bala)
+      static calculateVedicSunRiseSet(jd0, lat, lon) {
+        const phi = this.toRad(lat);
+        let riseUtc = 6.0 - (lon / 15.0);
+        let setUtc = 18.0 - (lon / 15.0);
+        for (let iter = 0; iter < 3; iter++) {
+          const jdRise = jd0 + riseUtc / 24.0;
+          const snapRise = this.calculateSingleSnapshot(jdRise, lat, lon);
+          const sinDec = Math.sin(this.toRad(snapRise.eps0)) * Math.sin(this.toRad(snapRise.sunSayana));
+          let decRise = Math.asin(Math.max(-1, Math.min(1, sinDec)));
+          
+          // Vedic Sun-center (0 deg altitude)
+          let cosH0Rise = (-Math.sin(phi) * Math.sin(decRise)) / (Math.cos(phi) * Math.cos(decRise) || 1e-6);
+          if (isNaN(cosH0Rise)) cosH0Rise = 0;
+          cosH0Rise = Math.max(-1, Math.min(1, cosH0Rise));
+          const H0Rise = this.toDeg(Math.acos(cosH0Rise));
+          riseUtc = 12.0 - (H0Rise / 15.0) - (lon / 15.0);
+
+          const jdSet = jd0 + setUtc / 24.0;
+          const snapSet = this.calculateSingleSnapshot(jdSet, lat, lon);
+          const sinDecSet = Math.sin(this.toRad(snapSet.eps0)) * Math.sin(this.toRad(snapSet.sunSayana));
+          let decSet = Math.asin(Math.max(-1, Math.min(1, sinDecSet)));
+
+          let cosH0Set = (-Math.sin(phi) * Math.sin(decSet)) / (Math.cos(phi) * Math.cos(decSet) || 1e-6);
+          if (isNaN(cosH0Set)) cosH0Set = 0;
+          cosH0Set = Math.max(-1, Math.min(1, cosH0Set));
+          const H0Set = this.toDeg(Math.acos(cosH0Set));
+          setUtc = 12.0 + (H0Set / 15.0) - (lon / 15.0);
+        }
+        return { riseLocalHour: (riseUtc + 5.5 + 24) % 24, setLocalHour: (setUtc + 5.5 + 24) % 24 };
       }
 
       static calculateSunRiseSet(jd0, lat, lon) {
@@ -1083,6 +1213,7 @@
           return { mandiDeg: 0, gulikaDeg: 0 };
         }
       }
+
       static calculatePositions(jd, lat, lon) {
         const ayanamsa = this.getLahiriAyanamsa(jd);
         const curr = this.calculateSingleSnapshot(jd, lat, lon);
@@ -1099,6 +1230,7 @@
 
         return {
           ayanamsa: ayanamsa,
+          eps0: curr.eps0,
           Lagna: toNirayana(curr.lagnaSayana),
           MC: toNirayana(curr.mcSayana),
           Surya: toNirayana(curr.sunSayana),
@@ -1110,6 +1242,16 @@
           Shani: toNirayana(curr.shaniSayana),
           Rahu: toNirayana(curr.rahuSayana),
           Ketu: toNirayana(curr.ketuSayana),
+          sayana: {
+            Surya: curr.sunSayana,
+            Chandra: curr.moonSayana,
+            Kuja: curr.kujaSayana,
+            Budha: curr.budhaSayana,
+            Guru: curr.guruSayana,
+            Sukra: curr.sukraSayana,
+            Shani: curr.shaniSayana
+          },
+          helioMeanLongs: curr.helioMeanLongs,
           speeds: {
             Surya: getSpeed(curr.sunSayana, next.sunSayana),
             Chandra: getSpeed(curr.moonSayana, next.moonSayana),
@@ -1149,6 +1291,14 @@
       if (m >= 60) { m = 0; d += 1; }
       if (d >= 30) { d = 29; m = 59; s = 59; }
       return `${d}° ${m.toString().padStart(2, '0')}' ${s.toString().padStart(2, '0')}"`;
+    }
+
+    function formatDecimalHour(h) {
+      h = ((h % 24) + 24) % 24;
+      const hh = Math.floor(h);
+      const mm = Math.floor((h - hh) * 60);
+      const ss = Math.round(((h - hh) * 60 - mm) * 60);
+      return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
     }
 
     function getSignAndNakshatra(siderealDeg) {
@@ -1327,6 +1477,7 @@
       return 1;
     }
 
+    // ಗ್ರಹ ಸಮಯ ಗಣನೆ ಫಂಕ್ಷನ್ (Graha Samaya #1..27 Formula)
     function calculateGrahaSamaya(planetRashi, lagnaRashi, dashaOrderNumber) {
       const planetFromLagna = ((planetRashi - lagnaRashi + 12) % 12) + 1;
       const lagnaFromAries = lagnaRashi;
@@ -1337,11 +1488,12 @@
       return samayaNumber;
     }
 
+    // ವಿಂಶೋತ್ತರಿ ದಶಾ-ಭುಕ್ತಿ ಗಣನೆ ಫಂಕ್ಷನ್ (Vimshottari Dasha & Bhukti Engine)
     function calculateVimshottari(moonDeg, birthDate, daysPerYear = 365.256364) {
       const nakSpan = 360.0 / 27.0;
       const elapsedInNak = moonDeg % nakSpan;
       const elapsedRatio = elapsedInNak / nakSpan;
-      const nakIdx = Math.floor(moonDeg / nakSpan);
+      const nakIdx = Math.floor(moonDeg / nakSpan) % 27;
       const birthLord = NAK_LORDS[nakIdx];
       const fullYears = DASHA_YEARS[birthLord];
       const balanceYears = fullYears * (1.0 - elapsedRatio);
@@ -1387,6 +1539,537 @@
       }
 
       return { birthLord, balY, balM, balD, mahadashas };
+    }
+
+    // ==================== 480-VIRUPA SHADBALA, SRIPATI BHAVA BALA & VIMSHOPAKA ENGINE ====================
+    class Shadbala480Engine {
+      static norm(d) { return ((d % 360.0) + 360.0) % 360.0; }
+      static arcDist(a, b) {
+        let diff = Math.abs(this.norm(a) - this.norm(b));
+        return diff > 180.0 ? 360.0 - diff : diff;
+      }
+
+      static getSignLord(sign1To12) {
+        const map = {
+          1: 'Kuja', 2: 'Sukra', 3: 'Budha', 4: 'Chandra',
+          5: 'Surya', 6: 'Budha', 7: 'Sukra', 8: 'Kuja',
+          9: 'Guru', 10: 'Shani', 11: 'Shani', 12: 'Guru'
+        };
+        return map[sign1To12] || 'Surya';
+      }
+
+      // Natural Friendship (Naisargika Maitri): +1 Friend, 0 Neutral, -1 Enemy
+      static getNaturalRel(p1, p2) {
+        if (p1 === p2) return 1;
+        const table = {
+          Surya:   { Chandra: 1, Kuja: 1, Guru: 1, Budha: 0, Sukra: -1, Shani: -1 },
+          Chandra: { Surya: 1, Budha: 1, Kuja: 0, Guru: 0, Sukra: 0, Shani: 0 },
+          Kuja:    { Surya: 1, Chandra: 1, Guru: 1, Sukra: 0, Shani: 0, Budha: -1 },
+          Budha:   { Surya: 1, Sukra: 1, Kuja: 0, Guru: 0, Shani: 0, Chandra: -1 },
+          Guru:    { Surya: 1, Chandra: 1, Kuja: 1, Shani: 0, Budha: -1, Sukra: -1 },
+          Sukra:   { Budha: 1, Shani: 1, Kuja: 0, Guru: 0, Surya: -1, Chandra: -1 },
+          Shani:   { Budha: 1, Sukra: 1, Guru: 0, Surya: -1, Chandra: -1, Kuja: -1 }
+        };
+        return (table[p1] && table[p1][p2] !== undefined) ? table[p1][p2] : 0;
+      }
+
+      // Tatkalika Maitri (Temporary Friendship based on D1 sign distance: 2,3,4,10,11,12 = +1; else -1)
+      static getTatkalikaRel(sign1, sign2) {
+        const diff = ((sign2 - sign1 + 12) % 12) + 1;
+        return [2, 3, 4, 10, 11, 12].includes(diff) ? 1 : -1;
+      }
+
+      // Panchadha Maitri Score for Saptavargaja (45, 30, 22.5, 15, 7.5, 3.75, 1.875) & Vimshopaka (20, 18, 15, 10, 7, 5)
+      static getDignityCategory(pKey, signIdx, degInSign, d1Signs) {
+        const ownSigns = {
+          Surya: [5], Chandra: [4], Kuja: [1, 8], Budha: [3, 6],
+          Guru: [9, 12], Sukra: [2, 7], Shani: [10, 11]
+        };
+        // Moolatrikona check (for D1, and general sign check)
+        const mt = {
+          Surya: { sign: 5, max: 20 },
+          Chandra: { sign: 2, min: 3, max: 30 },
+          Kuja: { sign: 1, max: 12 },
+          Budha: { sign: 6, min: 15, max: 20 },
+          Guru: { sign: 9, max: 10 },
+          Sukra: { sign: 7, max: 15 },
+          Shani: { sign: 11, max: 20 }
+        };
+
+        const m = mt[pKey];
+        if (m && signIdx === m.sign && degInSign !== null) {
+          const minD = m.min || 0;
+          if (degInSign >= minD && degInSign < m.max) {
+            return 'MOOLATRIKONA';
+          }
+        }
+        if (ownSigns[pKey] && ownSigns[pKey].includes(signIdx)) {
+          return 'SWAKSHETRA';
+        }
+
+        const lord = this.getSignLord(signIdx);
+        const nat = this.getNaturalRel(pKey, lord);
+        const tat = this.getTatkalikaRel(d1Signs[pKey], d1Signs[lord]);
+        const comp = nat + tat;
+
+        if (comp === 2) return 'ADHIMITRA';
+        if (comp === 1) return 'MITRA';
+        if (comp === 0) return 'SAMA';
+        if (comp === -1) return 'SHATRU';
+        return 'ADHISHATRU';
+      }
+
+      // Drishti (Special Vedic Aspects in Virupas, max 60)
+      static getAspectVirupa(aspectingKey, diffDeg) {
+        const d = this.norm(diffDeg);
+        let base = 0;
+        if (d >= 30 && d < 60) base = (d - 30) / 2.0;
+        else if (d >= 60 && d < 90) base = 15.0 + (d - 60) * 1.0;
+        else if (d >= 90 && d < 120) base = 45.0 - (d - 90) / 2.0;
+        else if (d >= 120 && d < 150) base = 30.0 - (d - 120) * 1.0;
+        else if (d >= 150 && d < 180) base = (d - 150) * 2.0;
+        else if (d >= 180 && d <= 300) base = 60.0 - (d - 180) * 0.5;
+        else base = 0;
+
+        // Special full aspects (60 virupas)
+        if (aspectingKey === 'Kuja') {
+          if (d >= 90 && d <= 120) {
+            // 4th house aspect (90-120 peak at 90)
+            const bonus = 15.0 * (1.0 - Math.abs(d - 90) / 30.0);
+            base = Math.min(60.0, base + bonus);
+          }
+          if (d >= 210 && d <= 240) {
+            // 8th house aspect (210-240 peak at 210)
+            const bonus = 15.0 * (1.0 - Math.abs(d - 210) / 30.0);
+            base = Math.min(60.0, base + bonus);
+          }
+        } else if (aspectingKey === 'Guru') {
+          if (d >= 120 && d <= 150) {
+            // 5th house aspect (120-150 peak at 120)
+            const bonus = 60.0 * (1.0 - Math.abs(d - 120) / 30.0);
+            base = Math.max(base, bonus);
+          }
+          if (d >= 240 && d <= 270) {
+            // 9th house aspect (240-270 peak at 240)
+            const bonus = 30.0 * (1.0 - Math.abs(d - 240) / 30.0);
+            base = Math.min(60.0, base + bonus);
+          }
+        } else if (aspectingKey === 'Shani') {
+          if (d >= 60 && d <= 90) {
+            // 3rd house aspect (60-90 peak at 60)
+            const bonus = 45.0 * (1.0 - Math.abs(d - 60) / 30.0);
+            base = Math.max(base, bonus);
+          }
+          if (d >= 270 && d <= 300) {
+            // 10th house aspect (270-300 peak at 270)
+            const bonus = 45.0 * (1.0 - Math.abs(d - 270) / 30.0);
+            base = Math.min(60.0, base + bonus);
+          }
+        }
+        return base;
+      }
+
+      static computeFull(c, rawPos) {
+        const keys7 = ['Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Sukra', 'Shani'];
+        const knMap = {
+          Surya: 'ಸೂರ್ಯ (Sun)', Chandra: 'ಚಂದ್ರ (Moon)', Kuja: 'ಮಂಗಳ (Mars)',
+          Budha: 'ಬುಧ (Mercury)', Guru: 'ಗುರು (Jupiter)', Sukra: 'ಶುಕ್ರ (Venus)', Shani: 'ಶನಿ (Saturn)'
+        };
+
+        // 1. Vedic Sunrise & Sunset
+        const [yr, mo, dy] = c.dateStr.split('-').map(Number);
+        const timeParts = c.timeStr.split(':').map(Number);
+        const decHour = (timeParts[0] || 0) + (timeParts[1] || 0) / 60.0 + (timeParts[2] || 0) / 3600.0;
+        const jd0 = Math.floor(EphemerisEngine.getJulianDay(yr, mo, dy, 0.0) + 0.5) - 0.5;
+        const vedicSun = EphemerisEngine.calculateVedicSunRiseSet(jd0, c.lat, c.lon);
+        const sr = vedicSun.riseLocalHour;
+        const ss = vedicSun.setLocalHour;
+        const isDay = (decHour >= sr && decHour < ss);
+        const dinamana = (ss >= sr) ? (ss - sr) : (ss + 24 - sr);
+        const ratrimana = 24.0 - dinamana;
+
+        // 2. D1 signs map
+        const d1Signs = {};
+        keys7.forEach(k => { d1Signs[k] = c.planets[k].sph.rashiIdx; });
+
+        // 3. Benefic / Malefic determination for Kaala & Drik Bala
+        // Paksha: Shukla Ashtami (tithiIdx >= 7) to Krishna Ashtami (tithiIdx <= 22) -> Chandra Benefic
+        const tithiDiff = this.norm(c.planets.Chandra.siderealDeg - c.planets.Surya.siderealDeg);
+        const tithiIdx = Math.floor(tithiDiff / 12.0); // 0 to 29
+        const isMoonBenefic = (tithiIdx >= 7 && tithiIdx <= 22);
+
+        // Budha benefic if not conjoined with malefic in D1 (Surya, Kuja, Shani, Rahu, Ketu, or waning Moon)
+        const budhaSign = d1Signs.Budha;
+        const maleficSigns = [d1Signs.Surya, d1Signs.Kuja, d1Signs.Shani, c.planets.Rahu.sph.rashiIdx, c.planets.Ketu.sph.rashiIdx];
+        if (!isMoonBenefic) maleficSigns.push(d1Signs.Chandra);
+        const isBudhaBenefic = !maleficSigns.includes(budhaSign);
+
+        const isPlanetBenefic = {
+          Surya: false,
+          Chandra: isMoonBenefic,
+          Kuja: false,
+          Budha: isBudhaBenefic,
+          Guru: true,
+          Sukra: true,
+          Shani: false
+        };
+
+        // 4. Exaltation Points (Paramochcha)
+        const exaltPoints = {
+          Surya: 10.0, Chandra: 33.0, Kuja: 298.0, Budha: 165.0,
+          Guru: 95.0, Sukra: 357.0, Shani: 200.0
+        };
+
+        // 5. Saptavargaja Dignity Score Map (480-Virupa System)
+        const saptaScoreMap = {
+          MOOLATRIKONA: 45.0,
+          SWAKSHETRA: 30.0,
+          ADHIMITRA: 22.5,
+          MITRA: 15.0,
+          SAMA: 7.5,
+          SHATRU: 3.75,
+          ADHISHATRU: 1.875
+        };
+
+        // 6. Digbala Nadir Points (Zero strength point; 180 deg away is 60 virupas)
+        // Guru & Budha -> Lagna (0), Surya & Kuja -> 10th Cusp (9), Shani -> 7th Cusp (6), Chandra & Sukra -> 4th Cusp (3)
+        const madhyas = c.sripati.madhyas;
+        const digMaxCusps = {
+          Guru: madhyas[0],
+          Budha: madhyas[0],
+          Surya: madhyas[9],
+          Kuja: madhyas[9],
+          Shani: madhyas[6],
+          Chandra: madhyas[3],
+          Sukra: madhyas[3]
+        };
+
+        // 7. Paksha Bala base (Moon-Sun angular distance / 3 = 0..60)
+        const pakshaDist = this.arcDist(c.planets.Chandra.siderealDeg, c.planets.Surya.siderealDeg);
+        const beneficPaksha = pakshaDist / 3.0; // 0 to 60
+        const maleficPaksha = 60.0 - beneficPaksha;
+
+        // 8. Natonnata Bala (Noon / Midnight interval converted to degrees / 3)
+        const localNoon = (sr + ss) / 2.0;
+        const localMidnight = (localNoon + 12.0) % 24.0;
+        let hrsFromMidnight = Math.abs(decHour - localMidnight);
+        if (hrsFromMidnight > 12.0) hrsFromMidnight = 24.0 - hrsFromMidnight;
+        const nathaDeg = hrsFromMidnight * 15.0; // 0 at midnight, 180 at noon
+        const diurnaNatonnata = nathaDeg / 3.0; // 60 at noon, 0 at midnight (Surya, Guru, Sukra)
+        const nocturnaNatonnata = 60.0 - diurnaNatonnata; // 60 at midnight, 0 at noon (Chandra, Kuja, Shani)
+
+        // 9. Tribhaga Bala (60 virupas)
+        // Day 3 parts: Budha, Surya, Shani | Night 3 parts: Chandra, Sukra, Kuja | Guru always gets 60
+        let tribhagaWinner = 'Budha';
+        if (isDay) {
+          const elapsedDay = (decHour - sr + 24) % 24;
+          const part = Math.floor((elapsedDay / dinamana) * 3);
+          tribhagaWinner = part === 0 ? 'Budha' : (part === 1 ? 'Surya' : 'Shani');
+        } else {
+          const nightStart = (decHour < sr) ? (ss - 24) : ss;
+          const elapsedNight = decHour - nightStart;
+          const part = Math.floor((elapsedNight / ratrimana) * 3);
+          tribhagaWinner = part === 0 ? 'Chandra' : (part === 1 ? 'Sukra' : 'Kuja');
+        }
+
+        // 10. Abda, Masa, Vara, Hora Bala (15, 30, 45, 60)
+        const vaaraIdx = c.birthDateObj.getDay(); // 0=Sun..6=Sat
+        const vaaraLords = ['Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Sukra', 'Shani'];
+        const varaLord = vaaraLords[vaaraIdx];
+
+        // Hora Lord (starts at Vedic sunrise with Vara Lord, 24 equal or 1-hr horas)
+        const hrsSinceSunrise = isDay ? (decHour - sr) : ((decHour < sr ? decHour + 24 : decHour) - sr);
+        const horaIdx = Math.floor(Math.max(0, hrsSinceSunrise)) % 24;
+        const horaSeq = ['Surya', 'Sukra', 'Budha', 'Chandra', 'Shani', 'Guru', 'Kuja'];
+        const startHoraPos = horaSeq.indexOf(varaLord);
+        const horaLord = horaSeq[(startHoraPos + horaIdx) % 7];
+
+        // Abda (Year) & Masa (Month) Lords based on Ahargana from Epoch (Jan 1, 1900 / Kali/Saka offset)
+        const daysSince2000 = Math.floor(c.jd - 2451545.0);
+        const abdaDayOffset = ((daysSince2000 % 360) + 360) % 360;
+        const abdaLord = vaaraLords[((vaaraIdx - (abdaDayOffset % 7)) + 70) % 7];
+        const masaDayOffset = ((daysSince2000 % 30) + 30) % 30;
+        const masaLord = vaaraLords[((vaaraIdx - (masaDayOffset % 7)) + 70) % 7];
+
+        // 11. Ayana Bala (Declination based, 60 virupas max)
+        const epsRad = EphemerisEngine.toRad(rawPos.eps0 || 23.439);
+        const ayanaBalaMap = {};
+        keys7.forEach(k => {
+          const sayanaRad = EphemerisEngine.toRad(rawPos.sayana[k]);
+          const declDeg = EphemerisEngine.toDeg(Math.asin(Math.sin(epsRad) * Math.sin(sayanaRad)));
+          const maxDecl = 23.45;
+          let ayana = 30.0;
+          if (k === 'Budha') {
+            ayana = 30.0 + (Math.abs(declDeg) / maxDecl) * 30.0;
+          } else if (['Surya', 'Kuja', 'Guru', 'Sukra'].includes(k)) {
+            ayana = 30.0 + (declDeg / maxDecl) * 30.0; // Northern declination strong
+          } else {
+            ayana = 30.0 - (declDeg / maxDecl) * 30.0; // Southern declination strong (Chandra, Shani)
+          }
+          ayanaBalaMap[k] = Math.max(0, Math.min(60.0, ayana));
+        });
+
+        // 12. Chesta Bala (Panchatara Grahas: Chesta Kendra formula; Sun = Ayana; Moon = Paksha)
+        const sunMeanLong = rawPos.sayana.Surya; // Approximated mean/true sun for Chesta Kendra
+        const chestaMap = {
+          Surya: ayanaBalaMap.Surya,
+          Chandra: isMoonBenefic ? beneficPaksha : maleficPaksha
+        };
+        ['Kuja', 'Budha', 'Guru', 'Sukra', 'Shani'].forEach(k => {
+          const helioL = rawPos.helioMeanLongs[k];
+          const geoTrue = rawPos.sayana[k];
+          let seeghrochcha = (k === 'Budha' || k === 'Sukra') ? helioL : sunMeanLong;
+          let avgPlanet = (k === 'Budha' || k === 'Sukra') ? sunMeanLong : helioL;
+          let chestaKendra = this.norm(seeghrochcha - (avgPlanet + geoTrue) / 2.0);
+          if (chestaKendra > 180.0) chestaKendra = 360.0 - chestaKendra;
+          chestaMap[k] = Math.max(0, Math.min(60.0, chestaKendra / 3.0));
+        });
+
+        // 13. Naisargika Bala (Natural Strength)
+        const naisargikaMap = {
+          Surya: 60.0, Chandra: 51.43, Sukra: 42.86, Guru: 34.29,
+          Budha: 25.71, Kuja: 17.14, Shani: 8.57
+        };
+
+        // Required Minimum Rupas (480-Virupa System)
+        const minReqRupas = {
+          Surya: 5.0, Chandra: 6.0, Kuja: 5.0, Budha: 7.0,
+          Guru: 6.5, Sukra: 5.5, Shani: 5.0
+        };
+
+        // Calculate preliminary Shadbala before Yuddha Bala
+        const results = {};
+        const saptaVargas = ['D1', 'D2', 'D3', 'D7', 'D9', 'D12', 'D30'];
+
+        keys7.forEach(k => {
+          const p = c.planets[k];
+          const deg360 = p.siderealDeg;
+          const signIdx = p.sph.rashiIdx;
+          const degInSign = p.sph.degInSign;
+
+          // --- STHANA BALA ---
+          // (a) Uchcha Bala (0 to 60 virupas)
+          const debilPoint = this.norm(exaltPoints[k] + 180.0);
+          const uchcha = this.arcDist(deg360, debilPoint) / 3.0;
+
+          // (b) Saptavargaja Bala (D1, D2, D3, D7, D9, D12, D30)
+          let saptavargaja = 0;
+          saptaVargas.forEach(vKey => {
+            const vSign = calculateDivisionalPosition(deg360, vKey);
+            const dig = this.getDignityCategory(k, vSign, vKey === 'D1' ? degInSign : null, d1Signs);
+            saptavargaja += saptaScoreMap[dig];
+          });
+
+          // (c) Ojayugmarashyamsa Bala (D1 & D9: Odd for Surya, Kuja, Budha, Guru, Shani; Even for Chandra, Sukra -> 15 each)
+          const isFemale = (k === 'Chandra' || k === 'Sukra');
+          const d9Sign = calculateDivisionalPosition(deg360, 'D9');
+          const d1Match = isFemale ? (signIdx % 2 === 0) : (signIdx % 2 !== 0);
+          const d9Match = isFemale ? (d9Sign % 2 === 0) : (d9Sign % 2 !== 0);
+          const ojayugma = (d1Match ? 15.0 : 0.0) + (d9Match ? 15.0 : 0.0);
+
+          // (d) Kendradi Bala (Kendra 1,4,7,10 = 60; Panapara 2,5,8,11 = 30; Apoklima 3,6,9,12 = 15)
+          const houseD1 = ((signIdx - c.lagnaSphuta.rashiIdx + 12) % 12) + 1;
+          const kendradi = [1, 4, 7, 10].includes(houseD1) ? 60.0 : ([2, 5, 8, 11].includes(houseD1) ? 30.0 : 15.0);
+
+          // (e) Drekkana Bala (1st decanate Male: Surya, Guru, Kuja; 2nd Neutral: Budha, Shani; 3rd Female: Chandra, Sukra -> 15)
+          const decanate = Math.floor(degInSign / 10.0) + 1; // 1, 2, 3
+          let drekkana = 0;
+          if (decanate === 1 && ['Surya', 'Guru', 'Kuja'].includes(k)) drekkana = 15.0;
+          else if (decanate === 2 && ['Budha', 'Shani'].includes(k)) drekkana = 15.0;
+          else if (decanate === 3 && ['Chandra', 'Sukra'].includes(k)) drekkana = 15.0;
+
+          const sthanaTotal = uchcha + saptavargaja + ojayugma + kendradi + drekkana;
+
+          // --- DIG BALA (Sripati Cusp based, 0 to 60) ---
+          const nadirCusp = this.norm(digMaxCusps[k] + 180.0);
+          const digBala = this.arcDist(deg360, nadirCusp) / 3.0;
+
+          // --- KAALA BALA ---
+          const natonnata = (k === 'Budha') ? 60.0 : (['Surya', 'Guru', 'Sukra'].includes(k) ? diurnaNatonnata : nocturnaNatonnata);
+          let paksha = isPlanetBenefic[k] ? beneficPaksha : maleficPaksha;
+          if (k === 'Chandra') paksha = paksha * 2.0; // Moon's Paksha Bala is doubled (up to 120 virupas)
+
+          const tribhaga = (k === 'Guru' || k === tribhagaWinner) ? 60.0 : 0.0;
+          const abda = (k === abdaLord) ? 15.0 : 0.0;
+          const masa = (k === masaLord) ? 30.0 : 0.0;
+          const vara = (k === varaLord) ? 45.0 : 0.0;
+          const hora = (k === horaLord) ? 60.0 : 0.0;
+          const amvh = abda + masa + vara + hora;
+          const ayana = ayanaBalaMap[k];
+
+          const kaalaBeforeWar = natonnata + paksha + tribhaga + amvh + ayana;
+
+          // --- CHESTA & NAISARGIKA ---
+          const chesta = chestaMap[k];
+          const naisargika = naisargikaMap[k];
+
+          // --- DRIK BALA (Spashta Drishti from all other 6 planets) ---
+          let netAspect = 0;
+          keys7.forEach(otherK => {
+            if (otherK === k) return;
+            const diff = this.norm(deg360 - c.planets[otherK].siderealDeg);
+            const aspVir = this.getAspectVirupa(otherK, diff);
+            if (isPlanetBenefic[otherK]) netAspect += aspVir;
+            else netAspect -= aspVir;
+          });
+          const drikBala = netAspect / 4.0;
+
+          results[k] = {
+            key: k,
+            knName: knMap[k],
+            uchcha, saptavargaja, ojayugma, kendradi, drekkana, sthanaTotal,
+            digBala,
+            natonnata, paksha, tribhaga, amvh, ayana, yuddha: 0.0, kaalaTotal: kaalaBeforeWar,
+            chesta, naisargika, drikBala,
+            totalVirupa: sthanaTotal + digBala + kaalaBeforeWar + chesta + naisargika + drikBala
+          };
+        });
+
+        // 14. Planetary War (Graha Yuddha): Panchatara Grahas within 1°; higher longitude loses its Shadbala diff to winner
+        const taragrahas = ['Kuja', 'Budha', 'Guru', 'Sukra', 'Shani'];
+        for (let i = 0; i < taragrahas.length; i++) {
+          for (let j = i + 1; j < taragrahas.length; j++) {
+            const pA = taragrahas[i];
+            const pB = taragrahas[j];
+            const degA = c.planets[pA].siderealDeg;
+            const degB = c.planets[pB].siderealDeg;
+            if (this.arcDist(degA, degB) <= 1.0) {
+              // Higher longitude loses
+              const loser = degA > degB ? pA : pB;
+              const winner = degA > degB ? pB : pA;
+              const diffBala = Math.abs(results[winner].totalVirupa - results[loser].totalVirupa);
+              results[winner].yuddha += diffBala;
+              results[loser].yuddha -= diffBala;
+              results[winner].kaalaTotal += diffBala;
+              results[loser].kaalaTotal -= diffBala;
+              results[winner].totalVirupa += diffBala;
+              results[loser].totalVirupa -= diffBala;
+            }
+          }
+        }
+
+        // 15. Finalize Rupas, Ratio, Rank, Ishta & Kashta Phala
+        const rankedList = keys7.map(k => {
+          const r = results[k];
+          r.totalRupas = r.totalVirupa / 60.0;
+          r.reqRupas = minReqRupas[k];
+          r.ratio = r.totalRupas / r.reqRupas;
+
+          // Ishta & Kashta Phala: sqrt(UchchaRashmi * ChestaRashmi)
+          const uRashmi = Math.max(0, r.uchcha);
+          const cRashmi = Math.max(0, r.chesta);
+          r.ishta = Math.sqrt(uRashmi * cRashmi);
+          r.kashta = Math.sqrt((60.0 - uRashmi) * (60.0 - cRashmi));
+          return r;
+        });
+
+        const sortedByRupas = [...rankedList].sort((a, b) => b.totalRupas - a.totalRupas);
+        sortedByRupas.forEach((item, idx) => {
+          results[item.key].rank = idx + 1;
+        });
+
+        // 16. Sripati Bhava Bala (12 Houses)
+        // Bhava Bala = Bhavadhipati Bala + Bhava Digbala + Bhava Drikbala (Mercury is ALWAYS benefic in Bhava Drikbala)
+        const bhavaBalas = [];
+        for (let b = 0; b < 12; b++) {
+          const cuspDeg = madhyas[b];
+          const cuspSign = Math.floor(this.norm(cuspDeg) / 30.0) + 1;
+          const lordKey = this.getSignLord(cuspSign);
+          const adhipatiBala = results[lordKey].totalVirupa;
+
+          // Bhava Digbala based on Cusp Sign Nature (Nara/Human, Jalachara/Watery, Chatushpada/Quadruped, Keeta/Insect)
+          // Nara (3,6,7,11,1st half 9) -> strongest in 1st (0)
+          // Chatushpada (1,2,5,2nd half 9,1st half 10) -> strongest in 10th (9)
+          // Jalachara (4,12,2nd half 10) -> strongest in 4th (3)
+          // Keeta (8) -> strongest in 7th (6)
+          const degInCuspSign = this.norm(cuspDeg) % 30.0;
+          let peakHouseIdx = 0; // default 1st house
+          if (cuspSign === 8) peakHouseIdx = 6; // Keeta -> 7th
+          else if (cuspSign === 4 || cuspSign === 12 || (cuspSign === 10 && degInCuspSign >= 15)) peakHouseIdx = 3; // Jalachara -> 4th
+          else if ([1, 2, 5].includes(cuspSign) || (cuspSign === 9 && degInCuspSign >= 15) || (cuspSign === 10 && degInCuspSign < 15)) peakHouseIdx = 9; // Chatushpada -> 10th
+          else peakHouseIdx = 0; // Nara -> 1st
+
+          const houseDistFromPeak = Math.min((b - peakHouseIdx + 12) % 12, (peakHouseIdx - b + 12) % 12);
+          const bhavaDigBala = (6 - houseDistFromPeak) * 10.0; // 0 to 60 virupas
+
+          // Bhava Drikbala (Mercury ALWAYS benefic here)
+          let bhavaNetAspect = 0;
+          keys7.forEach(pK => {
+            const diff = this.norm(cuspDeg - c.planets[pK].siderealDeg);
+            const aspVir = this.getAspectVirupa(pK, diff);
+            const isBenForBhava = (pK === 'Budha') ? true : isPlanetBenefic[pK];
+            if (isBenForBhava) bhavaNetAspect += aspVir;
+            else bhavaNetAspect -= aspVir;
+          });
+          const bhavaDrikBala = bhavaNetAspect / 4.0;
+
+          const totalBhavaVirupa = adhipatiBala + bhavaDigBala + bhavaDrikBala;
+          bhavaBalas.push({
+            bhavaNum: b + 1,
+            cuspDeg,
+            cuspSignName: RASHIS[cuspSign - 1].name,
+            lordKn: knMap[lordKey].split(' ')[0],
+            adhipatiBala,
+            bhavaDigBala,
+            bhavaDrikBala,
+            totalVirupa: totalBhavaVirupa,
+            totalRupas: totalBhavaVirupa / 60.0
+          });
+        }
+
+        // 17. Vimshopaka Bala (20-Point Scale: Shadvarga, Saptavarga, Dashavarga, Shodashavarga)
+        const vimDignityPoints = {
+          MOOLATRIKONA: 20, SWAKSHETRA: 20, ADHIMITRA: 18,
+          MITRA: 15, SAMA: 10, SHATRU: 7, ADHISHATRU: 5
+        };
+
+        const vargaWeights = {
+          shad: { D1: 6, D2: 2, D3: 4, D9: 5, D12: 2, D30: 1 }, // sum = 20
+          sapta: { D1: 5, D2: 2, D3: 3, D7: 2.5, D9: 4.5, D12: 2, D30: 1 }, // sum = 20
+          dasha: { D1: 3, D2: 1.5, D3: 1.5, D7: 1.5, D9: 1.5, D10: 1.5, D12: 1.5, D16: 1.5, D30: 1.5, D60: 5 }, // sum = 20
+          shodasha: {
+            D1: 3.5, D2: 1, D3: 1, D4: 0.5, D7: 0.5, D9: 3, D10: 0.5, D12: 0.5,
+            D16: 2, D20: 0.5, D24: 0.5, D27: 0.5, D30: 1, D40: 0.5, D45: 0.5, D60: 4
+          } // sum = 20
+        };
+
+        const vimshopakaList = keys7.map(k => {
+          const deg360 = c.planets[k].siderealDeg;
+          const degInSign = c.planets[k].sph.degInSign;
+
+          const calcWeighted = (weightMap) => {
+            let sum = 0;
+            Object.keys(weightMap).forEach(vKey => {
+              const vSign = calculateDivisionalPosition(deg360, vKey);
+              const dig = this.getDignityCategory(k, vSign, vKey === 'D1' ? degInSign : null, d1Signs);
+              const pts = vimDignityPoints[dig] || 10;
+              sum += (pts * weightMap[vKey]) / 20.0;
+            });
+            return sum;
+          };
+
+          return {
+            key: k,
+            knName: knMap[k],
+            shad: calcWeighted(vargaWeights.shad),
+            sapta: calcWeighted(vargaWeights.sapta),
+            dasha: calcWeighted(vargaWeights.dasha),
+            shodasha: calcWeighted(vargaWeights.shodasha)
+          };
+        });
+
+        return {
+          vedicSunrise: formatDecimalHour(sr),
+          vedicSunset: formatDecimalHour(ss),
+          dinamana: formatDecimalHour(dinamana),
+          ratrimana: formatDecimalHour(ratrimana),
+          varaLord: knMap[varaLord].split(' ')[0],
+          horaLord: knMap[horaLord].split(' ')[0],
+          planets: results,
+          bhavaBalas,
+          vimshopakaList
+        };
+      }
     }
 
     let CURRENT_CALC = null;
@@ -1528,8 +2211,11 @@
           sripati: finalSripati,
           planets, vaara, tithi, yoga, karana,
           vimshottari, birthDateObj,
-          upagrahas
+          upagrahas,
+          shadbala480: null
         };
+
+        CURRENT_CALC.shadbala480 = Shadbala480Engine.computeFull(CURRENT_CALC, rawPos);
 
         renderAll();
       } catch (err) {
@@ -1988,7 +2674,12 @@
     }
 
     function renderShadbalaTable(c) {
+      const sb = c.shadbala480;
       const tbody = document.getElementById('shadbalaTableBody');
+      const subBody = document.getElementById('shadbalaSubTableBody');
+      const bhavaBody = document.getElementById('bhavaBalaTableBody');
+      const vimBody = document.getElementById('vimshopakaTableBody');
+      const timingStrip = document.getElementById('vedicTimingStrip');
       const lordshipGrid = document.getElementById('lordshipGrid');
       const lagnaSub = document.getElementById('lordshipLagnaSubtitle');
 
@@ -1996,34 +2687,111 @@
         lagnaSub.textContent = `ಲಗ್ನ: ${c.lagnaSphuta.rashiName} (Rashi #${c.lagnaSphuta.rashiIdx}) ಆಧಾರಿತ ಗ್ರಹಾಧಿಪತ್ಯ`;
       }
 
-      const shadbalaRows = [
-        { name: "ಸೂರ್ಯ (Sun)", sth: "70.2", dig: "22.2", kal: "165.0", che: "36.0", nai: "60.0", drig: "7.6", vir: "360.9 ವಿ", rup: "6.02 ರೂ", req: "6.5", ishta: "20.04", kashta: "34.25", status: "ನ್ಯೂನ ಬಲ", statusClass: "bg-amber-50 text-amber-900 border-amber-300" },
-        { name: "ಚಂದ್ರ (Moon)", sth: "142.9", dig: "42.7", kal: "130.0", che: "39.2", nai: "51.4", drig: "14.2", vir: "420.4 ವಿ", rup: "7.01 ರೂ", req: "6.0", ishta: "47.84", kashta: "5.90", status: "ಬಲವಂತ (Strong)", statusClass: "bg-emerald-50 text-emerald-900 border-emerald-300" },
-        { name: "ಮಂಗಳ (Mars)", sth: "120.9", dig: "59.6", kal: "130.0", che: "25.0", nai: "17.1", drig: "15.1", vir: "367.7 ವಿ", rup: "6.13 ರೂ", req: "5.0", ishta: "35.45", kashta: "18.45", status: "ಬಲವಂತ (Strong)", statusClass: "bg-emerald-50 text-emerald-900 border-emerald-300" },
-        { name: "ಬುಧ (Mercury)", sth: "123.3", dig: "3.2", kal: "165.0", che: "25.0", nai: "25.7", drig: "7.9", vir: "350.0 ವಿ", rup: "5.83 ರೂ", req: "7.0", ishta: "38.14", kashta: "7.97", status: "ನ್ಯೂನ ಬಲ", statusClass: "bg-amber-50 text-amber-900 border-amber-300" },
-        { name: "ಗುರು (Jupiter)", sth: "71.5", dig: "47.6", kal: "165.0", che: "58.0", nai: "34.3", drig: "17.5", vir: "393.9 ವಿ", rup: "6.56 ರೂ", req: "6.5", ishta: "30.41", kashta: "9.39", status: "ಬಲವಂತ (Strong)", statusClass: "bg-emerald-50 text-emerald-900 border-emerald-300" },
-        { name: "ಶುಕ್ರ (Venus)", sth: "86.4", dig: "23.8", kal: "165.0", che: "25.0", nai: "42.9", drig: "9.3", vir: "352.3 ವಿ", rup: "5.87 ರೂ", req: "5.5", ishta: "13.45", kashta: "42.97", status: "ಬಲವಂತ (Strong)", statusClass: "bg-emerald-50 text-emerald-900 border-emerald-300" },
-        { name: "ಶನಿ (Saturn)", sth: "92.1", dig: "46.2", kal: "130.0", che: "25.0", nai: "8.6", drig: "11.1", vir: "312.9 ವಿ", rup: "5.21 ರೂ", req: "5.0", ishta: "13.40", kashta: "43.00", status: "ಬಲವಂತ (Strong)", statusClass: "bg-emerald-50 text-emerald-900 border-emerald-300" },
-        { name: "ರಾಹು (Rahu)", sth: "128.4", dig: "NaN", kal: "165.0", che: "58.0", nai: "15.0", drig: "16.8", vir: "NaN ವಿ", rup: "NaN ರೂ", req: "5.0", ishta: "58.68", kashta: "1.13", status: "ನ್ಯೂನ ಬಲ", statusClass: "bg-amber-50 text-amber-900 border-amber-300" },
-        { name: "ಕೇತು (Ketu)", sth: "69.6", dig: "NaN", kal: "165.0", che: "58.0", nai: "10.0", drig: "8.2", vir: "NaN ವಿ", rup: "NaN ರೂ", req: "5.0", ishta: "6.07", kashta: "10.90", status: "ನ್ಯೂನ ಬಲ", statusClass: "bg-amber-50 text-amber-900 border-amber-300" }
-      ];
+      if (sb && timingStrip) {
+        timingStrip.innerHTML = `
+          <div class="bg-emerald-50/60 p-2 rounded-xl border border-emerald-200 text-center">
+            <div class="text-[10px] text-emerald-800 font-semibold">ವೈದಿಕ ಸೂರ್ಯೋದಯ</div>
+            <div class="font-mono font-bold text-emerald-950 mt-0.5">${sb.vedicSunrise}</div>
+          </div>
+          <div class="bg-emerald-50/60 p-2 rounded-xl border border-emerald-200 text-center">
+            <div class="text-[10px] text-emerald-800 font-semibold">ವೈದಿಕ ಸೂರ್ಯಾಸ್ತ</div>
+            <div class="font-mono font-bold text-emerald-950 mt-0.5">${sb.vedicSunset}</div>
+          </div>
+          <div class="bg-emerald-50/60 p-2 rounded-xl border border-emerald-200 text-center">
+            <div class="text-[10px] text-emerald-800 font-semibold">ದಿನಮಾನ (Dinamana)</div>
+            <div class="font-mono font-bold text-emerald-950 mt-0.5">${sb.dinamana}</div>
+          </div>
+          <div class="bg-emerald-50/60 p-2 rounded-xl border border-emerald-200 text-center">
+            <div class="text-[10px] text-emerald-800 font-semibold">ರಾತ್ರಿಮಾನ (Ratrimana)</div>
+            <div class="font-mono font-bold text-emerald-950 mt-0.5">${sb.ratrimana}</div>
+          </div>
+          <div class="bg-amber-50/70 p-2 rounded-xl border border-amber-200 text-center">
+            <div class="text-[10px] text-amber-900 font-semibold">ವಾರಾಧಿಪತಿ (45 ವಿ)</div>
+            <div class="font-bold text-amber-950 mt-0.5">${sb.varaLord}</div>
+          </div>
+          <div class="bg-amber-50/70 p-2 rounded-xl border border-amber-200 text-center">
+            <div class="text-[10px] text-amber-900 font-semibold">ಹೋರಾಧಿಪತಿ (60 ವಿ)</div>
+            <div class="font-bold text-amber-950 mt-0.5">${sb.horaLord}</div>
+          </div>
+        `;
+      }
 
-      if (tbody) {
-        tbody.innerHTML = shadbalaRows.map(row => `
-          <tr class="hover:bg-emerald-50/50 transition">
-            <td class="py-2.5 px-3 font-bold text-gray-950">${row.name}</td>
-            <td class="py-2.5 px-2 text-center font-mono">${row.sth}</td>
-            <td class="py-2.5 px-2 text-center font-mono">${row.dig}</td>
-            <td class="py-2.5 px-2 text-center font-mono">${row.kal}</td>
-            <td class="py-2.5 px-2 text-center font-mono">${row.che}</td>
-            <td class="py-2.5 px-2 text-center font-mono">${row.nai}</td>
-            <td class="py-2.5 px-2 text-center font-mono">${row.drig}</td>
-            <td class="py-2.5 px-3 text-center font-mono font-bold text-gray-900">${row.vir}</td>
-            <td class="py-2.5 px-3 text-center font-mono font-bold text-gray-900">${row.rup}</td>
-            <td class="py-2.5 px-2 text-center font-mono text-gray-600">${row.req}</td>
-            <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-800">${row.ishta}</td>
-            <td class="py-2.5 px-3 text-center font-mono font-bold text-rose-800">${row.kashta}</td>
-            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 text-[11px] rounded-lg font-semibold border ${row.statusClass}">${row.status}</span></td>
+      const keys7 = ['Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Sukra', 'Shani'];
+
+      if (sb && tbody) {
+        tbody.innerHTML = keys7.map(k => {
+          const r = sb.planets[k];
+          const isStrong = r.totalRupas >= r.reqRupas;
+          const statusBadge = isStrong
+            ? `<span class="px-2 py-0.5 text-[10px] rounded-lg font-bold border bg-emerald-50 text-emerald-900 border-emerald-300">ಬಲವಂತ (Strong)</span>`
+            : `<span class="px-2 py-0.5 text-[10px] rounded-lg font-bold border bg-amber-50 text-amber-900 border-amber-300">ನ್ಯೂನ ಬಲ</span>`;
+
+          return `
+            <tr class="hover:bg-emerald-50/50 transition">
+              <td class="py-2.5 px-3 font-bold text-gray-950 whitespace-nowrap">${r.knName}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${r.sthanaTotal.toFixed(1)}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${r.digBala.toFixed(1)}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${r.kaalaTotal.toFixed(1)}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${r.chesta.toFixed(1)}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${r.naisargika.toFixed(2)}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${r.drikBala.toFixed(1)}</td>
+              <td class="py-2.5 px-3 text-center font-mono font-bold bg-emerald-50/60 text-emerald-950">${r.totalVirupa.toFixed(2)}</td>
+              <td class="py-2.5 px-3 text-center font-mono font-bold bg-emerald-50/60 text-emerald-950">${r.totalRupas.toFixed(2)}</td>
+              <td class="py-2.5 px-2 text-center font-mono text-gray-600">${r.reqRupas.toFixed(1)}</td>
+              <td class="py-2.5 px-2 text-center font-mono font-bold ${r.ratio >= 1 ? 'text-emerald-800' : 'text-amber-800'}">${r.ratio.toFixed(2)}x</td>
+              <td class="py-2.5 px-2 text-center font-bold"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-950 text-[10px]">#${r.rank}</span></td>
+              <td class="py-2.5 px-2 text-center font-mono font-bold text-emerald-800">${r.ishta.toFixed(2)}</td>
+              <td class="py-2.5 px-2 text-center font-mono font-bold text-rose-800">${r.kashta.toFixed(2)}</td>
+              <td class="py-2.5 px-3 text-center whitespace-nowrap">${statusBadge}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (sb && subBody) {
+        subBody.innerHTML = keys7.map(k => {
+          const r = sb.planets[k];
+          return `
+            <tr class="hover:bg-emerald-50/40">
+              <td class="py-2 px-2.5 font-sans font-bold text-gray-900 whitespace-nowrap">${r.knName}</td>
+              <td class="py-2 px-2 text-center">${r.uchcha.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center">${r.saptavargaja.toFixed(2)}</td>
+              <td class="py-2 px-2 text-center">${r.ojayugma.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center">${r.kendradi.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center">${r.drekkana.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center bg-emerald-50/40">${r.natonnata.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center bg-emerald-50/40">${r.paksha.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center bg-emerald-50/40">${r.tribhaga.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center bg-emerald-50/40">${r.amvh.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center bg-emerald-50/40">${r.ayana.toFixed(1)}</td>
+              <td class="py-2 px-2 text-center bg-emerald-50/40 font-bold ${r.yuddha !== 0 ? 'text-rose-700' : ''}">${r.yuddha.toFixed(1)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (sb && bhavaBody) {
+        bhavaBody.innerHTML = sb.bhavaBalas.map(bh => `
+          <tr class="hover:bg-emerald-50/40 transition">
+            <td class="py-2 px-2.5 font-bold text-emerald-950">${bh.bhavaNum}ನೇ ಭಾವ (${bh.cuspSignName})</td>
+            <td class="py-2 px-2 font-mono text-[11px] text-gray-700">${format360Deg(bh.cuspDeg)}</td>
+            <td class="py-2 px-2 font-semibold text-emerald-900">${bh.lordKn}</td>
+            <td class="py-2 px-2 text-center font-mono">${bh.adhipatiBala.toFixed(1)}</td>
+            <td class="py-2 px-2 text-center font-mono">${bh.bhavaDigBala.toFixed(1)}</td>
+            <td class="py-2 px-2 text-center font-mono">${bh.bhavaDrikBala.toFixed(1)}</td>
+            <td class="py-2 px-2.5 text-center font-mono font-bold text-emerald-950">${bh.totalVirupa.toFixed(1)} ವಿ (${bh.totalRupas.toFixed(2)} ರೂ)</td>
+          </tr>
+        `).join('');
+      }
+
+      if (sb && vimBody) {
+        vimBody.innerHTML = sb.vimshopakaList.map(v => `
+          <tr class="hover:bg-emerald-50/40 transition">
+            <td class="py-2.5 px-3 font-bold text-gray-950">${v.knName}</td>
+            <td class="py-2.5 px-2.5 text-center font-mono">${v.shad.toFixed(2)}</td>
+            <td class="py-2.5 px-2.5 text-center font-mono">${v.sapta.toFixed(2)}</td>
+            <td class="py-2.5 px-2.5 text-center font-mono">${v.dasha.toFixed(2)}</td>
+            <td class="py-2.5 px-2.5 text-center font-mono font-bold bg-emerald-50/60 ${v.shodasha >= 15 ? 'text-emerald-800' : (v.shodasha >= 10 ? 'text-amber-800' : 'text-rose-800')}">${v.shodasha.toFixed(2)} / 20</td>
           </tr>
         `).join('');
       }
@@ -2097,14 +2865,17 @@
     function renderHealthCross(c) {
       const crossGrid = document.getElementById('healthCrossGrid');
       if (!crossGrid) return;
+      const sb = c.shadbala480;
+      const getIshtaStr = (k, fallback) => (sb && sb.planets[k]) ? sb.planets[k].ishta.toFixed(2) : fallback;
+
       const surveyQuestions = [
-        { key: 'Surya', name: 'ಸೂರ್ಯ', grain: 'ಗೋಧಿ (Wheat)', ishta: '20.04', badgeClass: 'bg-amber-50 text-amber-800 border-amber-200', question: 'ಗೋಧಿ ಸೇವಿಸಿದಾಗ ಗ್ಯಾಸ್ಟ್ರಿಕ್ ಅಥವಾ ಹೊಟ್ಟೆ ಉಬ್ಬರವಾಗುವುದೇ?' },
-        { key: 'Chandra', name: 'ಚಂದ್ರ', grain: 'ಅಕ್ಕಿ (Rice)', ishta: '47.84', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', question: 'ಅನ್ನ ಸೇವಿಸಿದಾಗ ಶೀತ ಅಥವಾ ಕಫ ಕಟ್ಟುತ್ತದೆಯೇ?' },
-        { key: 'Kuja', name: 'ಮಂಗಳ', grain: 'ತೊಗರಿ ಬೇಳೆ (Toor Dal)', ishta: '35.45', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', question: 'ತೊಗರಿ ಬೇಳೆ ತಿಂದಾಗ ಎದೆಯುರಿ ಅಥವಾ ಆಮ್ಲೀಯತೆ ಬಾಧಿಸುವುದೇ?' },
-        { key: 'Budha', name: 'ಬುಧ', grain: 'ಹೆಸರು ಕಾಳು (Moong Dal)', ishta: '38.14', badgeClass: 'bg-rose-50 text-rose-800 border-rose-200', question: 'ಹೆಸರು ಬೇಳೆ ಸೇವಿಸಿದಾಗ ಲವಲವಿಕೆ ಮತ್ತು ಹಗುರವೆನಿಸುವುದೇ?' },
-        { key: 'Guru', name: 'ಗುರು', grain: 'ಕಡಲೆ ಕಾಳು (Chana)', ishta: '30.41', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', question: 'ಕಡಲೆ ಕಾಳು/ಹಿಟ್ಟು ತಿಂದರೆ ಹೊಟ್ಟೆ ಭಾರ ಅಥವಾ ಗ್ಯಾಸ್ಟ್ರಿಕ್ ಆಗುವುದೇ?' },
-        { key: 'Sukra', name: 'ಶುಕ್ರ', grain: 'ಅವರೆ ಕಾಳು (Flat Beans)', ishta: '13.45', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', question: 'ಅವರೆ ಕಾಳು ತಿಂದಾಗ ಕೀಲು ನೋವು ಅಥವಾ ವಾತ ಬಾಧಿಸುವುದೇ?' },
-        { key: 'Shani', name: 'ಶನಿ', grain: 'ಎಳ್ಳು (Sesame Seeds)', ishta: '13.40', badgeClass: 'bg-amber-50 text-amber-800 border-amber-200', question: 'ಎಳ್ಳು ಅಥವಾ ಎಣ್ಣೆಯುಕ್ತ ಆಹಾರ ತಿಂದಾಗ ಮೈಕೈ ನೋವು ಹೆಚ್ಚುವುದೇ?' },
+        { key: 'Surya', name: 'ಸೂರ್ಯ', grain: 'ಗೋಧಿ (Wheat)', ishta: getIshtaStr('Surya', '20.04'), badgeClass: 'bg-amber-50 text-amber-800 border-amber-200', question: 'ಗೋಧಿ ಸೇವಿಸಿದಾಗ ಗ್ಯಾಸ್ಟ್ರಿಕ್ ಅಥವಾ ಹೊಟ್ಟೆ ಉಬ್ಬರವಾಗುವುದೇ?' },
+        { key: 'Chandra', name: 'ಚಂದ್ರ', grain: 'ಅಕ್ಕಿ (Rice)', ishta: getIshtaStr('Chandra', '47.84'), badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', question: 'ಅನ್ನ ಸೇವಿಸಿದಾಗ ಶೀತ ಅಥವಾ ಕಫ ಕಟ್ಟುತ್ತದೆಯೇ?' },
+        { key: 'Kuja', name: 'ಮಂಗಳ', grain: 'ತೊಗರಿ ಬೇಳೆ (Toor Dal)', ishta: getIshtaStr('Kuja', '35.45'), badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', question: 'ತೊಗರಿ ಬೇಳೆ ತಿಂದಾಗ ಎದೆಯುರಿ ಅಥವಾ ಆಮ್ಲೀಯತೆ ಬಾಧಿಸುವುದೇ?' },
+        { key: 'Budha', name: 'ಬುಧ', grain: 'ಹೆಸರು ಕಾಳು (Moong Dal)', ishta: getIshtaStr('Budha', '38.14'), badgeClass: 'bg-rose-50 text-rose-800 border-rose-200', question: 'ಹೆಸರು ಬೇಳೆ ಸೇವಿಸಿದಾಗ ಲವಲವಿಕೆ ಮತ್ತು ಹಗುರವೆನಿಸುವುದೇ?' },
+        { key: 'Guru', name: 'ಗುರು', grain: 'ಕಡಲೆ ಕಾಳು (Chana)', ishta: getIshtaStr('Guru', '30.41'), badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', question: 'ಕಡಲೆ ಕಾಳು/ಹಿಟ್ಟು ತಿಂದರೆ ಹೊಟ್ಟೆ ಭಾರ ಅಥವಾ ಗ್ಯಾಸ್ಟ್ರಿಕ್ ಆಗುವುದೇ?' },
+        { key: 'Sukra', name: 'ಶುಕ್ರ', grain: 'ಅವರೆ ಕಾಳು (Flat Beans)', ishta: getIshtaStr('Sukra', '13.45'), badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', question: 'ಅವರೆ ಕಾಳು ತಿಂದಾಗ ಕೀಲು ನೋವು ಅಥವಾ ವಾತ ಬಾಧಿಸುವುದೇ?' },
+        { key: 'Shani', name: 'ಶನಿ', grain: 'ಎಳ್ಳು (Sesame Seeds)', ishta: getIshtaStr('Shani', '13.40'), badgeClass: 'bg-amber-50 text-amber-800 border-amber-200', question: 'ಎಳ್ಳು ಅಥವಾ ಎಣ್ಣೆಯುಕ್ತ ಆಹಾರ ತಿಂದಾಗ ಮೈಕೈ ನೋವು ಹೆಚ್ಚುವುದೇ?' },
         { key: 'Rahu', name: 'ರಾಹು', grain: 'ಉದ್ದು (Urad Dal)', ishta: '58.68', badgeClass: 'bg-amber-50 text-amber-800 border-amber-200', question: 'ಉದ್ದಿನ ಪದಾರ್ಥ ಸೇವಿಸಿದರೆ ಅಜೀರ್ಣ ಅಥವಾ ಗ್ಯಾಸ್ಟ್ರಿಕ್ ಉಂಟಾಗುವುದೇ?' },
         { key: 'Ketu', name: 'ಕೇತು', grain: 'ಹುರುಳಿ (Horsegram)', ishta: '24.18', badgeClass: 'bg-amber-50 text-amber-800 border-amber-200', question: 'ಹುರುಳಿ ಕಾಳು ತಿಂದಾಗ ಅತಿಯಾದ ಉಷ್ಣ ಅಥವಾ ಮೂಲವ್ಯಾಧಿ ಬಾಧಿಸುವುದೇ?' }
       ];
@@ -2155,17 +2926,7 @@
       if (elNak) elNak.textContent = `${c.planets.Chandra.sph.nakName} (${c.planets.Chandra.sph.pada}ನೇ ಪಾದ)`;
 
       const grainsMap = { Surya: "ಗೋಧಿ", Chandra: "ಅಕ್ಕಿ", Kuja: "ತೊಗರಿ ಬೇಳೆ", Budha: "ಹೆಸರು ಕಾಳು", Guru: "ಕಡಲೆ ಕಾಳು", Sukra: "ಅವರೆ ಕಾಳು", Shani: "ಎಳ್ಳು", Rahu: "ಉದ್ದು", Ketu: "ಹುರುಳಿ" };
-      const shadbalaMatrix = {
-        Surya: { vir: 360.9, rup: 6.02, ishta: "20.04", kashta: "34.25" },
-        Chandra: { vir: 420.4, rup: 7.01, ishta: "47.84", kashta: "5.90" },
-        Kuja: { vir: 367.7, rup: 6.13, ishta: "35.45", kashta: "18.45" },
-        Budha: { vir: 350.0, rup: 5.83, ishta: "38.14", kashta: "7.97" },
-        Guru: { vir: 393.9, rup: 6.56, ishta: "30.41", kashta: "9.39" },
-        Sukra: { vir: 352.3, rup: 5.87, ishta: "13.45", kashta: "42.97" },
-        Shani: { vir: 312.9, rup: 5.21, ishta: "13.40", kashta: "43.00" },
-        Rahu: { vir: null, rup: null, ishta: "58.68", kashta: "1.13" },
-        Ketu: { vir: null, rup: null, ishta: "6.07", kashta: "10.90" }
-      };
+      const sb480 = c.shadbala480;
 
       const tbody = document.getElementById('clientReportTableBody');
       if (!tbody) return;
@@ -2175,9 +2936,17 @@
         const p = c.planets[key];
         const sD1 = SAMAYA_DICT[p.samayaD1] || { name: `ಸಮಯ #${p.samayaD1}` };
         const sBh = SAMAYA_DICT[p.samayaBhava] || { name: `ಸಮಯ #${p.samayaBhava}` };
-        const sb = shadbalaMatrix[key];
         const grainName = grainsMap[key];
-        const shadbalaText = (sb.vir !== null) ? `${sb.vir.toFixed(1)} ವಿ (${sb.rup.toFixed(2)} ರೂ)` : `— (ಛಾಯಾಗ್ರಹ)`;
+
+        let shadbalaText = `— (ಛಾಯಾಗ್ರಹ)`;
+        let ishtaTxt = `—`;
+        let kashtaTxt = `—`;
+        if (sb480 && sb480.planets[key]) {
+          const r = sb480.planets[key];
+          shadbalaText = `${r.totalVirupa.toFixed(1)} ವಿ (${r.totalRupas.toFixed(2)} ರೂ)`;
+          ishtaTxt = r.ishta.toFixed(2);
+          kashtaTxt = r.kashta.toFixed(2);
+        }
 
         return `
           <tr class="hover:bg-emerald-50/50 transition">
@@ -2186,12 +2955,70 @@
             <td class="py-2.5 px-3 text-gray-950">#${p.samayaD1} ${sD1.name}</td>
             <td class="py-2.5 px-3 text-gray-950 font-medium">#${p.samayaBhava} ${sBh.name}</td>
             <td class="py-2.5 px-3 font-mono text-gray-900">${shadbalaText}</td>
-            <td class="py-2.5 px-3 font-mono font-semibold text-center text-emerald-800">${sb.ishta}</td>
-            <td class="py-2.5 px-3 font-mono font-semibold text-center text-rose-800">${sb.kashta}</td>
+            <td class="py-2.5 px-3 font-mono font-semibold text-center text-emerald-800">${ishtaTxt}</td>
+            <td class="py-2.5 px-3 font-mono font-semibold text-center text-rose-800">${kashtaTxt}</td>
             <td class="py-2.5 px-3 font-medium text-gray-950">${grainName}</td>
           </tr>
         `;
       }).join('');
+
+      // Populate Plain Text Client Report Box automatically
+      const textBox = document.getElementById('plainTextReportBox');
+      if (textBox) {
+        const janmaRashi = c.planets.Chandra.sph.rashiName;
+        const janmaNak = `${c.planets.Chandra.sph.nakName} (${c.planets.Chandra.sph.pada}ನೇ ಪಾದ)`;
+        const d9LagnaName = RASHIS[d9Sign - 1].name;
+
+        const sphutaLines = planetOrder.map(key => {
+          const p = c.planets[key];
+          const retroTag = p.isRetro ? ' (R)' : '';
+          return `• ${p.knName}${retroTag}: ${p.sph.rashiName} ${p.sph.formattedRel} | ${p.sph.nakName} (${p.sph.pada}ನೇ ಪಾದ)`;
+        }).join('\n');
+
+        const samayaLines = planetOrder.map(key => {
+          const p = c.planets[key];
+          const sD1 = SAMAYA_DICT[p.samayaD1] || { name: `ಸಮಯ #${p.samayaD1}`, cat: "ಶುಭ", desc: "ಶುಭ ಫಲ" };
+          let line = `• ${p.knName}: #${p.samayaD1} ${sD1.name} [${sD1.cat}]\n  ಫಲ: ${sD1.desc}`;
+
+          if (p.samayaBhava !== p.samayaD1) {
+            const sBh = SAMAYA_DICT[p.samayaBhava] || { name: `ಸಮಯ #${p.samayaBhava}`, cat: "ಶುಭ", desc: "ಶುಭ ಫಲ" };
+            line += `\n  ↳ ಭಾವ ಚಲಿತ ಫಲ: #${p.samayaBhava} ${sBh.name} [${sBh.cat}] — ${sBh.desc}`;
+          }
+          return line;
+        }).join('\n\n');
+
+        textBox.value = [
+          `ॐ VEDA ASTROLIGHT — ಜಾತಕ & ಗ್ರಹ ಸಮಯ ವರದಿ`,
+          `ಜ್ಯೋತಿಷಿ: ಸತ್ಯಬೋಧ ನಾಗೇಂದ್ರ | ಸಂಪರ್ಕ: 7349577177`,
+          `==================================================`,
+          `ಹೆಸರು / ಪ್ರಶ್ನ: ${c.name}`,
+          `ದಿನಾಂಕ & ಸಮಯ: ${c.dateStr} | ${c.timeStr}`,
+          `ಸ್ಥಳ: ${c.place}`,
+          ``,
+          `ಜನನ ರಾಶಿ: ${janmaRashi}`,
+          `ಜನ್ಮ ನಕ್ಷತ್ರ: ${janmaNak}`,
+          `D1 ಲಗ್ನ: ${c.lagnaSphuta.rashiName} (${c.lagnaSphuta.formattedRel})`,
+          `D9 ನವಾಂಶ ಲಗ್ನ: ${d9LagnaName}`,
+          ``,
+          `ಗ್ರಹಸ್ಪುಟ ಸಾರಾಂಶ (Graha Sphuta):`,
+          `--------------------------------------------------`,
+          sphutaLines,
+          ``,
+          `ನವಗ್ರಹ ಸಮಯ ಫಲ (Graha Samaya):`,
+          `--------------------------------------------------`,
+          samayaLines,
+          `==================================================`
+        ].join('\n');
+      }
+    }
+
+    function copyTextReport() {
+      const textBox = document.getElementById('plainTextReportBox');
+      if (!textBox || !textBox.value.trim()) return;
+
+      textBox.select();
+      document.execCommand('copy');
+      showToast('ವರದಿ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!');
     }
 
     function switchTab(tabId) {
@@ -2326,201 +3153,38 @@
     });
   </script>
 
-    <script>
-    // ==================== GOOGLE SHEET LICENSE CONTROL ENGINE ====================
-    const NEW_SHEET_ID = "15b20sLV9h_2avk4ofhHXm9NsmjYS-MUAMmEOUfQXycA";
-    const APP_DISPLAY_NAME = "Veda Astrolight - Graha Samaya & Jataka";
-    const LICENSE_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${NEW_SHEET_ID}/gviz/tq?tqx=out:csv`;
-    const STORAGE_PREFIX = "veda_jataka_samaya_";
+  <script>
+    // ==================== SIMPLE DEV PASSWORD LOCK (1008) ====================
+    const DEV_LOCK_CODE = "1008";
+    const DEV_UNLOCK_KEY = "veda_dev_unlocked_1008";
 
-    function getOrCreateDeviceId() {
-      let devId = localStorage.getItem(STORAGE_PREFIX + "device_id");
-      if (!devId) {
-        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        let rand = "";
-        for (let i = 0; i < 5; i++) {
-          rand += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        devId = "VA-" + rand;
-        localStorage.setItem(STORAGE_PREFIX + "device_id", devId);
-      }
-      return devId;
-    }
+    function unlockWithDevPass() {
+      const inp = document.getElementById("devPassInput");
+      const errEl = document.getElementById("devPassError");
+      const lockEl = document.getElementById("dev-password-lock");
+      if (!inp) return;
 
-    function parseCSVRow(rowStr) {
-      const result = [];
-      let cur = "", inQuotes = false;
-      for (let i = 0; i < rowStr.length; i++) {
-        const ch = rowStr[i];
-        if (ch === '"') inQuotes = !inQuotes;
-        else if (ch === ',' && !inQuotes) { result.push(cur.trim()); cur = ""; }
-        else cur += ch;
-      }
-      result.push(cur.trim());
-      return result;
-    }
-
-    function normalizeDateToISO(dateStr) {
-      if (!dateStr) return "";
-      const clean = dateStr.replace(/\//g, "-").trim();
-      const parts = clean.split("-");
-      if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
-      return clean;
-    }
-
-    function copyDeviceId() {
-      const devId = getOrCreateDeviceId();
-      navigator.clipboard.writeText(devId).then(() => {
-        alert("ನಿಮ್ಮ Device ID (" + devId + ") ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!");
-      });
-    }
-
-    function requestActivationWhatsApp() {
-      const devId = getOrCreateDeviceId();
-      const uName = document.getElementById("lic-user-name").value.trim() || "ಹೆಸರು ನಮೂದಿಸಿಲ್ಲ";
-      const uEmail = document.getElementById("lic-user-email").value.trim() || "ಇಮೇಲ್ ನಮೂದಿಸಿಲ್ಲ";
-      localStorage.setItem(STORAGE_PREFIX + "lic_name", uName);
-      localStorage.setItem(STORAGE_PREFIX + "lic_email", uEmail);
-
-      const msg = `ನಮಸ್ಕಾರ ಸತ್ಯಬೋಧರೇ (${APP_DISPLAY_NAME}),%0Aನನಗೆ 1 ವರ್ಷದ ಲೈಸೆನ್ಸ್ ಆಕ್ಟಿವೇಶನ್ ಬೇಕಾಗಿದೆ.%0A%0A• Device ID: *${devId}*%0A• ಹೆಸರು: ${encodeURIComponent(uName)}%0A• ಇಮೇಲ್: ${encodeURIComponent(uEmail)}%0A%0Aದಯವಿಟ್ಟು ಆಕ್ಟಿವೇಟ್ ಮಾಡಿಕೊಡಿ.`;
-      window.open(`https://wa.me/917349577177?text=${msg}`, "_blank");
-    }
-
-    function activateFreeTrial() {
-      if (localStorage.getItem(STORAGE_PREFIX + "trial_used") === "true") {
-        alert("ನಿಮ್ಮ 15 ನಿಮಿಷಗಳ ಉಚಿತ ಟ್ರಯಲ್ ಈಗಾಗಲೇ ಬಳಕೆಯಾಗಿದೆ. ಮುಂದುವರಿಯಲು WhatsApp ಮೂಲಕ ಆಕ್ಟಿವೇಶನ್ ಪಡೆಯಿರಿ.");
-        return;
-      }
-      const expiryTs = Date.now() + (15 * 60 * 1000);
-      localStorage.setItem(STORAGE_PREFIX + "trial_used", "true");
-      localStorage.setItem(STORAGE_PREFIX + "trial_expiry", String(expiryTs));
-      verifyLicenseNow(false);
-    }
-
-    function showLicenseInfoModal() {
-      const devId = getOrCreateDeviceId();
-      const cachedLic = JSON.parse(localStorage.getItem(STORAGE_PREFIX + "license_cache") || "null");
-      const trialExp = parseInt(localStorage.getItem(STORAGE_PREFIX + "trial_expiry") || "0");
-      let info = `ನಿಮ್ಮ Device ID: ${devId}\n`;
-
-      if (cachedLic && cachedLic.status === "ACTIVE") {
-        info += `ಸ್ಥಿತಿ: ಸಕ್ರಿಯ (ACTIVE)\nಕೊನೆಯ ದಿನಾಂಕ: ${cachedLic.expiry}`;
-      } else if (trialExp > Date.now()) {
-        const minsLeft = Math.ceil((trialExp - Date.now()) / 60000);
-        info += `ಸ್ಥಿತಿ: 15-Min Free Trial (ಇನ್ನು ${minsLeft} ನಿಮಿಷ ಬಾಕಿ ಇದೆ)`;
+      if (inp.value.trim() === DEV_LOCK_CODE) {
+        sessionStorage.setItem(DEV_UNLOCK_KEY, "true");
+        if (errEl) errEl.classList.add("hidden");
+        if (lockEl) lockEl.classList.add("hidden");
       } else {
-        info += `ಸ್ಥಿತಿ: ಲೈಸೆನ್ಸ್ ಸಕ್ರಿಯವಾಗಿಲ್ಲ`;
-      }
-
-      if (confirm(info + "\n\nಲೈಸೆನ್ಸ್ ಪರಿಶೀಲಿಸಲು ಅಥವಾ ಆಕ್ಟಿವೇಶನ್ ಪರದೆ ತೆರೆಯಲು OK ಒತ್ತಿ.")) {
-        document.getElementById("lock-device-id").textContent = devId;
-        document.getElementById("lic-user-name").value = localStorage.getItem(STORAGE_PREFIX + "lic_name") || "";
-        document.getElementById("lic-user-email").value = localStorage.getItem(STORAGE_PREFIX + "lic_email") || "";
-        document.getElementById("license-lock-overlay").classList.remove("hidden");
-      }
-    }
-
-    async function verifyLicenseNow(isManualClick = false) {
-      const devId = getOrCreateDeviceId();
-      const lockOverlay = document.getElementById("license-lock-overlay");
-      const lockDeviceEl = document.getElementById("lock-device-id");
-      const lockMsgEl = document.getElementById("lock-status-msg");
-      const pillEl = document.getElementById("license-status-pill");
-      const pillTextEl = document.getElementById("license-pill-text");
-      const btnTrial = document.getElementById("btn-start-trial");
-
-      if (lockDeviceEl) lockDeviceEl.textContent = devId;
-      if (localStorage.getItem(STORAGE_PREFIX + "trial_used") === "true" && btnTrial) {
-        btnTrial.classList.add("hidden");
-      }
-
-      const todayStr = new Date().toISOString().slice(0, 10);
-
-      try {
-        const res = await fetch(LICENSE_SHEET_CSV_URL + "&t=" + Date.now());
-        if (res.ok) {
-          const csvText = await res.text();
-          const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
-          let matchedRecord = null;
-
-          for (let i = 1; i < lines.length; i++) {
-            const cols = parseCSVRow(lines[i]);
-            if (cols.length >= 5) {
-              const rowDevId = cols[0].toUpperCase().trim();
-              const rowName = cols[1];
-              const rowEmail = cols[2];
-              const rowExpiry = normalizeDateToISO(cols[3]);
-              const rowStatus = cols[4].toUpperCase().trim();
-
-              if (rowDevId === devId.toUpperCase()) {
-                matchedRecord = { deviceId: rowDevId, name: rowName, email: rowEmail, expiry: rowExpiry, status: rowStatus };
-                break;
-              }
-            }
-          }
-
-          if (matchedRecord) {
-            localStorage.setItem(STORAGE_PREFIX + "license_cache", JSON.stringify(matchedRecord));
-            if (matchedRecord.status === "ACTIVE" && matchedRecord.expiry >= todayStr) {
-              lockOverlay.classList.add("hidden");
-              if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-              if (pillTextEl) pillTextEl.textContent = `Licensed (${matchedRecord.expiry})`;
-              if (isManualClick) alert(`ಅಭಿನಂದನೆಗಳು ${matchedRecord.name || ''}! ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ${matchedRecord.expiry} ರವರೆಗೆ ಸಕ್ರಿಯವಾಗಿದೆ.`);
-              return;
-            } else {
-              lockMsgEl.textContent = matchedRecord.expiry < todayStr
-                ? `⚠️ ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ಅವಧಿ (${matchedRecord.expiry}) ಮುಗಿದಿದೆ. ದಯವಿಟ್ಟು ನವೀಕರಿಸಿ.`
-                : `⚠️ ನಿಮ್ಮ ಲೈಸೆನ್ಸ್ ಸ್ಥಿತಿ: ${matchedRecord.status}. ಸತ್ಯಬೋಧರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
-              lockOverlay.classList.remove("hidden");
-              if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-              if (pillTextEl) pillTextEl.textContent = "Expired / Locked";
-              return;
-            }
-          } else {
-            localStorage.removeItem(STORAGE_PREFIX + "license_cache");
-          }
-        }
-      } catch (err) {
-        const cached = JSON.parse(localStorage.getItem(STORAGE_PREFIX + "license_cache") || "null");
-        if (cached && cached.deviceId === devId && cached.status === "ACTIVE" && cached.expiry >= todayStr) {
-          lockOverlay.classList.add("hidden");
-          if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-          if (pillTextEl) pillTextEl.textContent = `Licensed (${cached.expiry})`;
-          return;
-        }
-      }
-
-      // Check 15-Minute Free Trial
-      const trialExp = parseInt(localStorage.getItem(STORAGE_PREFIX + "trial_expiry") || "0");
-      if (trialExp > Date.now()) {
-        const minsLeft = Math.ceil((trialExp - Date.now()) / 60000);
-        lockOverlay.classList.add("hidden");
-        if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-        if (pillTextEl) pillTextEl.textContent = `Trial (${minsLeft}m left)`;
-        return;
-      }
-
-      document.getElementById("lic-user-name").value = localStorage.getItem(STORAGE_PREFIX + "lic_name") || "";
-      document.getElementById("lic-user-email").value = localStorage.getItem(STORAGE_PREFIX + "lic_email") || "";
-      lockOverlay.classList.remove("hidden");
-      if (pillEl) pillEl.className = "px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1 shadow-sm text-xs";
-      if (pillTextEl) pillTextEl.textContent = "Activation Required";
-      if (isManualClick) {
-        alert("ಇನ್ನೂ ನಿಮ್ಮ Device ID (" + devId + ") ಆಕ್ಟಿವೇಟ್ ಆಗಿಲ್ಲ. ದಯವಿಟ್ಟು WhatsApp ಮೂಲಕ ಸತ್ಯಬೋಧರಿಗೆ ಕಳುಹಿಸಿ.");
+        if (errEl) errEl.classList.remove("hidden");
+        inp.value = "";
+        inp.focus();
       }
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      verifyLicenseNow(false);
-      // ಪ್ರತಿ 15 ಸೆಕೆಂಡ್‌ಗೆ ಒಮ್ಮೆ ಲೈವ್ ಪರಿಶೀಲನೆ (ಟ್ರಯಲ್ ಮುಗಿದರೆ ಅಥವಾ INACTIVE ಮಾಡಿದರೆ ತಕ್ಷಣ ಲಾಕ್ ಆಗಲು)
-      setInterval(() => {
-        verifyLicenseNow(false);
-      }, 15000);
+      const lockEl = document.getElementById("dev-password-lock");
+      if (sessionStorage.getItem(DEV_UNLOCK_KEY) === "true") {
+        if (lockEl) lockEl.classList.add("hidden");
+      } else if (lockEl) {
+        lockEl.classList.remove("hidden");
+      }
 
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed', err));
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
       }
     });
   </script>
